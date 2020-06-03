@@ -16,12 +16,15 @@ function net.HasOverflowed()
 end
 
 chatexp.Devs = {
-	--Owners
+
+	-- Original Creators
+
 	["STEAM_0:1:74836666"] = "Trixter",
 	["STEAM_0:1:62445445"] = "Q2F2",
 	["STEAM_0:0:133411986"] = "CakeShaked", --Trixter alt acc
 
-	--Devs
+	-- Original Devs ( I did not comment these people below they were that way originally )
+
 	--["STEAM_0:0:80997988"] = "oplexz",
 	["STEAM_0:1:32476157"] = "Tenrys",
 	["STEAM_0:0:80669850"] = "user4992",
@@ -29,6 +32,11 @@ chatexp.Devs = {
 	["STEAM_0:0:42138604"] = "Liquid",
 	["STEAM_0:0:62588856"] = "Ghosty",
 	--["STEAM_0:1:29543208"] = "ToastyEngineer",
+
+	-- New Devs ( The people who didn't make the gamemode but are currently adding new content and maintaning the gamemode )
+
+	["STEAM_1:1:71013395"] = "RockerOfWorlds", -- Currently maintaining the gamemode.
+
 }
 
 local tagParse
@@ -47,14 +55,12 @@ do
 	end
 
 	local ranks_tags = {
+
 		["some_rank"] = { -- Group name on ULX, make sure to spell it right
 			color = red,
 			title = "Some Rank",
 		},
-		["some_other_rank"] = {
-			color = blu,
-			title = "Some Other Rank",
-		},
+
 	}
 
 	-- ported from chitchat2
@@ -134,7 +140,7 @@ chatexp.Modes = {
 				end
 
 				tbl[#tbl + 1] = color_green
-				tbl[#tbl + 1] = "(TEAM) "
+				tbl[#tbl + 1] = "(FACTION) "
 
 				tagParse(tbl, ply)
 

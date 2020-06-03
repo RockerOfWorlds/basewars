@@ -219,6 +219,33 @@ function GM:EntityTakeDamage(ent, dmginfo)
 		ent:SetColor(Color)
 	return end
 
+	if not Player and not Attacker:IsPlayer() and Attacker.IsExplosive and not ent:GetClass() == "prop_physics" then
+
+		local filter_list = {}
+
+		for k, v in next, ents.GetAll() do
+
+			if not v == ent then
+
+				table.insert( filter_list, v )
+
+			end
+
+		end
+
+		local trace = { start = ent:GetPos(), endpos = Attacker:GetPos(), filter = filter_list }
+		local tr = util.TraceEntity( trace, Attacker )
+
+		if not ( tr.Hit ) then
+
+			dmginfo:SetDamage( 0 )
+
+			return
+
+		end
+
+	end
+
 	if ent:IsPlayer() then
 		if not Attacker:IsPlayer() and dmginfo:IsDamageType(DMG_CRUSH) and (Attacker:IsWorld() or (IsValid(Attacker) and not Attacker:CreatedByMap())) then
 			dmginfo:SetDamage(0)

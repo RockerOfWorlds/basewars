@@ -37,12 +37,12 @@ bp = bp:gsub("\n", " ")
 local function unfuckName(t)
 	local t = t
 	if not t or not isstring(t) then return end
-	
+
 	t = t:gsub("\n", " ")
 	if #t > 36 then
 		t = utf8.sub(t, 1, 36)
 	end
-	
+
 	return t
 end
 
@@ -80,7 +80,7 @@ if SERVER then
 			local color = net.ReadColor()
 
 			if password:Trim() == "" then password = nil end
-			
+
 			-- Don't forget to XD guys
 			if value and not (ply:IsAdmin() --[=[or (ply:SteamID() == "STEAM_0:1:62445445" and value == bp)]=]) then
 				value = unfuckName(value)
@@ -168,6 +168,14 @@ function MODULE:Set(ply, value, password, force)
 	if not Faction then
 
 		ply:Notify(BaseWars.LANG.FactionNotExist, BASEWARS_NOTIFICATION_ERROR)
+
+		return
+
+	end
+
+	if table.Count( Faction.members ) >= BaseWars.Config.MaxFactionSize then
+
+		ply:Notify("This faction already has reached the limit (" .. tostring( BaseWars.Config.MaxFactionSize ) .. " Players)!")
 
 		return
 

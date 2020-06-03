@@ -39,20 +39,23 @@ BaseWars.Config = {
 	XPMultiplier = 1.0,
 
 	-- Forums: Link to your forums, accessed with /forums
-	Forums 		= "http://hexahedron.pw/forums/",
+	Forums 		= "https://forums.notfound.tech",
+	-- Rules: Link to your rules, accessed with /rules and the F3 Menu.
+	RulesURL		= "https://forums.notfound.tech/index.php?threads/english-basewars-rules-list.1/",
 	-- SteamGroup: Link to your steam group, accessed with /steam
-	SteamGroup 	= "http://steamcommunity.com/groups/hexahedronic",
+	SteamGroup 	= "http://steamcommunity.com/groups/notfoundtech",
 	-- Workshop: Link to your workshop download, accessed with /workshop
 	Workshop    = "http://steamcommunity.com/sharedfiles/filedetails/?id=939081277",
 	-- Discord: Link to your discord server, accessed with /discord
-	Discord 	= "https://discord.gg/stdEJkF",
+	Discord 	= "https://discord.gg/kt3Gb4u",
 
 	-- ScaleVIPPayDay: Should VIP ranks get better paydays, scaling with their money?
 	ScaleVIPPayDay = true,
 	-- VIPRanks: Table of ranks which VIP items and ScaleVIPPayDay, etc applies to
-	VIPRanks = {
-		"donators",
-	},
+	VIPRanks = { "v.i.p" },
+
+	-- DisableGiveMoney: This disables the ability to give money if you'd prefer not to have that.
+	DisableGiveMoney = false,
 
 	-- MaximumPay: Maximum amount players can give eachother, helps stop inflation
 	MaximumPay = 5 * 10^4,
@@ -181,7 +184,7 @@ BaseWars.Config = {
 		-- IsHTML: Is the next variable HTML, if not it is a URI to a valid HTML file
 		IsHTML 	= false,
 		-- HTML: HTML string or valid URI
-		HTML	= "http://hexahedron.pw/forums/showthread.php?tid=16&pid=33#pid33",
+		HTML	= "https://forums.notfound.tech/index.php?threads/english-basewars-rules-list.1/",
 	},
 
 	Adverts = {
@@ -270,7 +273,7 @@ BaseWars.Config = {
 	StartMoney 			= 5000,
 
 	-- CustomChat: Load the built in custom chatbox, disable if you use your own (ours is better)
-	CustomChat			= false,
+	CustomChat			= true,
 	-- ExtraStuff: Load some extra things such as source engine fixes and player nickname customiser, disable if you dont want this
 	ExtraStuff			= true,
 	-- CleanProps: Finds all physics props on the map and removes them when all the entities are frist initialized (AKA: When the map first loads)
@@ -283,6 +286,9 @@ BaseWars.Config = {
 	DefaultWalk			= 140,
 	-- DefaultRun: Default running speed with no drugs,
 	DefaultRun			= 300,
+
+	-- MaxFactionSize: Changes the max amount of players allowed in a faction.
+	MaxFactionSize = 5,
 
 	-- DefaultLimit: If no limit for an entity is specified this will be used, set to math.huge if you like your server crashing
 	DefaultLimit		= 5,
@@ -421,8 +427,9 @@ BaseWars.AdvertTbl = {
 
 	{Grey, "Remember to join our ", NiceGreen, "Steam Group", Grey, "! (/steam)"},
 	{Grey, "You can find out more on the ", NiceGreen, "Forums", Grey, "! (/forums)"},
+	{Grey, "To find our ", NiceGreen, "Rules", Grey, " type ! (/rules)"},
 	{Grey, "To download our content manually, type ", NiceGreen, "/workshop"},
-	{Grey, "We have a ", NiceGreen, "discord", Grey, "! (/discord)"}
+	{Grey, "We have a ", NiceGreen, "Discord", Grey, "! (/discord)"}
 
 }
 

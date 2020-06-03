@@ -29,6 +29,9 @@ do
 	IncludeCS("default_config.lua")
 
 	IncludeCS("shared/spawnmenu.lua")
+	IncludeCS("shared/sitting.lua")
+	IncludeCS("shared/pop_out_mouse.lua")
+	IncludeCS("shared/interaction_menu.lua")
 
 	IncludeCS("shared/cppi.lua")
 	IncludeCS("shared/admin.lua")
@@ -57,6 +60,9 @@ do
 	LoadFileCS("client/cl_interactions.lua")
 	LoadFileCS("client/cl_minimap.lua")
 	LoadFileCS("client/gui_cleanup.lua")
+	LoadFileCS("client/cl_tesla_range_menu.lua")
+	LoadFileCS("client/cl_bw_storage_crate_menu.lua")
+	LoadFileCS("client/cl_factioninvite.lua")
 
 	if BaseWars.Config.CustomChat then
 		LoadFileCS("client/qchat.lua")

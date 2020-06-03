@@ -1,750 +1,700 @@
--- BaseWars Menu for things and shit
--- by Ghosty
+surface.CreateFont( "Trebuchet_new", {
 
-local me = LocalPlayer()
+    font = "Trebuchet MS",
+    size = 20
 
-local button_width = 152
-local grayTop 		= Color(128, 128, 128, 250)
-local grayBottom 	= Color(96, 96, 96, 250)
+} )
 
-local nodePanelBg	= Color(192, 192, 192, 250)
-local shadowColor 	= Color(0, 0, 0, 200)
+local button_color = Color( 70, 70, 70 )
+local button_hover_color = Color( 75, 75, 75 )
 
-local bigFont = "BW.Menu.BigFont"
-local medFont = "BW.Menu.MedFont"
-local smallFont = "BW.Menu.SmallFont"
+local function bwmenu( open_tab, open_tab2 )
 
-surface.CreateFont(bigFont, {
-	font = "Roboto",
-	size = 32,
-})
+    if IsValid( bwmenu_frame ) then bwmenu_frame:Close() return end
 
-surface.CreateFont(medFont, {
-	font = "Roboto",
-	size = 18,
-})
+    local tabs = { { ["tab"] = "factions", ["name"] = "Factions", ["icon"] = "icon16/group.png" }, { ["tab"] = "raids", ["name"] = "Raids", ["icon"] = "icon16/error.png" }, { ["tab"] = "rules", ["name"] = "Rules", ["icon"] = "icon16/page_white.png", ["link"] = BaseWars.Config.RulesURL }, { ["tab"] = "guide", ["name"] = "Guide", ["icon"] = "icon16/note.png", ["link"] = "https://forums.notfound.tech/index.php?threads/english-basewars-guide.136/" } } -- { ["tab"] = "prestige", ["name"] = "Prestige", ["icon"] = "icon16/clock.png" }, { ["tab"] = "staff", ["name"] = "Staff", ["icon"] = "icon16/shield.png", ["link"] = "https://notfound.tech/staff" }, { ["tab"] = "leaderboard", ["name"] = "Leaderboard", ["icon"] = "icon16/award_star_gold_1.png", ["link"] = "https://notfound.tech/leaderboard" }, { ["tab"] = "settings", ["name"] = "Settings", ["icon"] = "icon16/cog.png" } }
+    local buttons = { ["Factions"] = { { ["button"] = "create_faction", ["name"] = "Create Faction" }, { ["button"] = "join_faction", ["name"] = "Join Faction" }, { ["button"] = "leave_faction", ["name"] = "Leave Faction" }, { ["button"] = "invite_faction", ["name"] = "Invite To Faction" }, { ["button"] = "kick_faction", ["name"] = "Kick From Faction" } }, ["Raids"] = { { ["button"] = "start_raid", ["name"] = "Start Raid" }, { ["button"] = "concede_raid", ["name"] = "Concede Raid" } } }
 
-surface.CreateFont(smallFont, {
-	font = "Roboto",
-	size = 16,
-})
+    local me = LocalPlayer()
 
+    local bwmenu_frame = vgui.Create( "DFrame" )
+    bwmenu_frame:SetSize( 960, 540 )
+    bwmenu_frame:SetTitle( "" )
+    bwmenu_frame:SetDraggable( false )
+    bwmenu_frame:MakePopup()
 
-local PANEL = {}
+    function bwmenu_frame:OnKeyCodeReleased( key )
 
-local white = Color(255, 255, 255)
-local gray = Color(192, 192, 192)
-local black = Color(0, 0, 0)
-local errorcolor = Color(255, 100, 100)
-local highlight = Color(100, 100, 100, 200)
+        if key == KEY_F3 then
 
-function PANEL:CheckError()
-	return false
-end
+            bwmenu_frame:Close()
 
-function PANEL:Paint(w, h)
-	draw.RoundedBox(4, 0, 0, w, h, black)
-	draw.RoundedBox(4, 1, 1, w - 2, h - 2, self:CheckError() and errorcolor or white)
+        end
 
-	self:DrawTextEntryText(black, highlight, gray)
-
-	return false
-end
-
-vgui.Register("BaseWars.ErrorCheckTextEntry", PANEL, "DTextEntry")
-
-local function PrepMenu()
-	local mainFrame = vgui.Create("DFrame")
-
-	mainFrame:SetSize(900, 600)
-	mainFrame:Center()
-	mainFrame:SetTitle(BaseWars.LANG.BaseWarsMenu)
-	mainFrame:SetIcon("icon16/application.png")
-	mainFrame:MakePopup()
-	mainFrame:SetDeleteOnClose(false)
-
-	function mainFrame:Paint(w, h)
-		draw.RoundedBoxEx(8, 0, 0, w, 24, grayTop, true, true, false, false)
-		draw.RoundedBox(0, 0, 24, w, h - 24, grayBottom)
-	end
-
-	function mainFrame:Close()
-		self:Hide()
-		self:OnClose()
-	end
-
-	local tabPanel = mainFrame:Add("DPropertySheet")
-
-	tabPanel:Dock(FILL)
-	tabPanel:SetWide(200)
-
-	function tabPanel:MakeTab(name, icon)
-		local dpanel = vgui.Create("DPanel")
-		self:AddSheet(name, dpanel, icon)
-
-		return dpanel
-	end
-
-	local ftionTab = tabPanel:MakeTab(BaseWars.LANG.Factions, "icon16/layers.png")
-	local raidsTab = tabPanel:MakeTab(BaseWars.LANG.Raids, "icon16/building_delete.png")
-	local rulesTab = tabPanel:MakeTab(BaseWars.LANG.Rules, "icon16/script.png")
-	--local infoTab  = tabPanel:MakeTab("", "icon16/help.png")
-
-	return mainFrame, tabPanel, ftionTab, raidsTab, rulesTab--, infoTab
-end
-
-local function MakePlayerList(pnl)
-	local plyList = pnl:Add("DListView")
-
-	plyList:AddColumn(BaseWars.LANG.Player)
-	plyList:AddColumn(BaseWars.LANG.Faction)
-
-	plyList:Dock(FILL)
-
-	plyList.PlayerLines = {}
-
-	local function GetPlayer(t)
-		for _, ply in next, player.GetAll() do
-			if ply:Nick() == t then
-			return ply end
-		end
-
-		return false
-	end
-
-	function plyList:UpdatePlayers()
-		local plys = player.GetAll()
-
-		for _, ply in pairs(plys) do
-			if ply == me then continue end
-
-			local plyInFaction, plyFaction = ply:InFaction(), ply:GetFaction()
-			if not self.PlayerLines[ply] then
-				local line = self:AddLine(ply:Nick(), plyInFaction and plyFaction or BaseWars.LANG.NoFaction)
-				self.PlayerLines[ply] = line
-			end
-		end
-
-		for ply, pnl in pairs(self.PlayerLines) do
-			if not IsValid(pnl) then
-				pnl:Remove()
-				continue
-			end
-
-			if not pnl.SetColumnText then
-				pnl:Remove()
-				continue
-			end
-
-			if not IsValid(ply) then
-				local id = pnl:GetID()
-				self:RemoveLine(id)
-				self.PlayerLines[ply] = nil
-
-				continue
-			end
-
-			local plyInFaction, plyFaction = ply:InFaction(), ply:GetFaction()
-			pnl:SetColumnText(2, plyInFaction and plyFaction or BaseWars.LANG.NoFaction)
-		end
-	end
-
-	function plyList:Think()
-		self:UpdatePlayers()
-	end
-
-	function plyList:OnRowSelected(id, panel)
-		if not panel or not IsValid(panel) then return end
-
-		self.SelectedPly = GetPlayer(panel:GetColumnText(1))
-	end
-
-	plyList:UpdatePlayers()
-
-	return plyList
-end
-
-local dialogs = {
-	Factions = {
-		Create = function(pnl)
-			pnl:SetTitle(BaseWars.LANG.CreateFaction:upper())
-
-			local warning = pnl:Add("DLabel")
-				warning:Dock(TOP)
-				warning:SetText(BaseWars.LANG.CreateNotice)
-				warning:SetFont(smallFont)
-				warning:SetBright(true)
-				warning:SizeToContents()
-
-			local nameLabel = pnl:Add("DLabel")
-				nameLabel:Dock(TOP)
-				nameLabel:DockMargin(0, 16 + 4, 0, 0)
-				nameLabel:SetText(BaseWars.LANG.FactionName)
-				nameLabel:SetFont(smallFont)
-				nameLabel:SizeToContents()
-
-			local nameInput = pnl:Add("DTextEntry")
-				nameInput:Dock(TOP)
-				nameInput:DockMargin(0, 0, 260, 0)
-
-			local pwLabel = pnl:Add("DLabel")
-				pwLabel:Dock(TOP)
-				pwLabel:DockMargin(0, 4, 0, 0)
-				pwLabel:SetText(BaseWars.LANG.FactionPassword)
-				pwLabel:SetFont(smallFont)
-				pwLabel:SizeToContents()
-
-			local pwInput = pnl:Add("DTextEntry")
-				pwInput:Dock(TOP)
-				pwInput:DockMargin(0, 0, 260, 0)
-
-			local colorpanel = pnl:Add("DPanel")
-				local defcol = HSVToColor(math.random(359), math.Rand(0.8, 1), math.Rand(0.8, 1))
-				colorpanel:SetPos(480, 35 + 160 + 10)
-				colorpanel:SetSize(160 + 10 + 25, 25)
-				colorpanel:SetBackgroundColor(defcol)
-
-				local bgCol = Color(30, 30, 30)
-				function colorpanel:Paint(w, h)
-					surface.SetDrawColor(bgCol)
-					surface.DrawOutlinedRect(0, 0, w, h)
-				end
-
-			local colorcube = pnl:Add("DColorCube")
-				colorcube:SetPos(480, 35)
-				colorcube:SetSize(160, 160)
-				colorcube.CurColor = defcol
-				colorcube:SetColor(colorcube.CurColor)
-
-				function colorcube:OnUserChanged(col)
-					colorpanel:SetBackgroundColor(col)
-					colorcube.CurColor = col
-				end
-
-			local colorpicker = pnl:Add("DRGBPicker")
-				colorpicker:SetPos(480 + 160 + 10, 35)
-				colorpicker:SetSize(25, 160)
-
-				function colorpicker:OnChange(col)
-					colorcube:SetColor(col)
-					colorpanel:SetBackgroundColor(col)
-					colorcube.CurColor = col
-				end
-
-			local buttonpar = pnl:Add("Panel")
-				buttonpar:Dock(TOP)
-				buttonpar:DockMargin(0, 24, 0, 0)
-				buttonpar:SetTall(24)
-
-			local createButton = buttonpar:Add("DButton")
-				createButton:Dock(LEFT)
-				createButton:SetWide(button_width)
-				createButton:SetText(BaseWars.LANG.Create)
-				createButton:SetImage("icon16/tick.png")
-				createButton:SetFont(smallFont)
-
-				function createButton:DoClick()
-					local name, pw = nameInput:GetValue(), pwInput:GetValue()
-					name, pw = name:Trim(), pw:Trim()
-
-					me:CreateFaction(name, (#pw > 0 and pw), colorcube.CurColor)
-
-					pnl:Close()
-				end
-
-				function createButton:Think()
-					local name, pw = nameInput:GetValue(), pwInput:GetValue()
-					name, pw = name:Trim(), pw:Trim()
-
-					self:SetDisabled(false)
-
-					if
-						(#name < 5 or #name > 36)
-						or
-						(#pw > 0 and (#pw < 5 or #pw > 32))
-					then
-						self:SetDisabled(true)
-
-						return
-					end
-				end
-
-			local cancelButton = buttonpar:Add("DButton")
-				cancelButton:Dock(LEFT)
-				cancelButton:DockMargin(4, 0, 0, 0)
-				cancelButton:SetWide(button_width)
-				cancelButton:SetText(BaseWars.LANG.Nevermind)
-				cancelButton:SetImage("icon16/cross.png")
-				cancelButton:SetFont(smallFont)
-
-			function cancelButton:DoClick()
-				pnl:Close()
-			end
-
-			pnl:SetTall(250 - 8)
-		end,
-
-		Join = function(pnl, txt)
-			pnl:SetTitle(BaseWars.LANG.JoinFaction:upper())
-
-			local warning = pnl:Add("DLabel")
-				warning:Dock(TOP)
-				warning:SetText(BaseWars.LANG.JoinWarning)
-				warning:SetFont(smallFont)
-				warning:SetBright(true)
-				warning:SizeToContents()
-
-			local nameLabel = pnl:Add("DLabel")
-				nameLabel:Dock(TOP)
-				nameLabel:DockMargin(0, 16 + 4, 0, 0)
-				nameLabel:SetText(BaseWars.LANG.FactionName)
-				nameLabel:SetFont(smallFont)
-				nameLabel:SizeToContents()
-
-			local nameInput = pnl:Add("DTextEntry")
-				nameInput:Dock(TOP)
-				nameInput:SetValue(txt or "")
-
-			local pwLabel = pnl:Add("DLabel")
-				pwLabel:Dock(TOP)
-				pwLabel:DockMargin(0, 4, 0, 0)
-				pwLabel:SetText(BaseWars.LANG.FactionPassword)
-				pwLabel:SetFont(smallFont)
-				pwLabel:SizeToContents()
-
-			local pwInput = pnl:Add("DTextEntry")
-				pwInput:Dock(TOP)
-
-			local buttonpar = pnl:Add("Panel")
-				buttonpar:Dock(TOP)
-				buttonpar:DockMargin(0, 24, 0, 0)
-				buttonpar:SetTall(24)
-
-			local createButton = buttonpar:Add("DButton")
-				createButton:Dock(LEFT)
-				createButton:SetWide(button_width)
-				createButton:SetText(BaseWars.LANG.Join)
-				createButton:SetImage("icon16/tick.png")
-				createButton:SetFont(smallFont)
-
-				function createButton:DoClick()
-					local name, pw = nameInput:GetValue(), pwInput:GetValue()
-					name, pw = name:Trim(), pw:Trim()
-
-					me:JoinFaction(name, (#pw > 0 and pw), true)
-
-					pnl:Close()
-				end
-
-				function createButton:Think()
-					local name, pw = nameInput:GetValue(), pwInput:GetValue()
-					name, pw = name:Trim(), pw:Trim()
-
-					self:SetDisabled(false)
-
-					if
-						(#name < 5 or #name > 36)
-						or
-						(#pw > 0 and (#pw < 5 or #pw > 32))
-					then
-						self:SetDisabled(true)
-						return
-					end
-				end
-
-			local cancelButton = buttonpar:Add("DButton")
-				cancelButton:Dock(LEFT)
-				cancelButton:DockMargin(4, 0, 0, 0)
-				cancelButton:SetWide(button_width)
-				cancelButton:SetText(BaseWars.LANG.Nevermind)
-				cancelButton:SetImage("icon16/cross.png")
-				cancelButton:SetFont(smallFont)
-
-				function cancelButton:DoClick()
-					pnl:Close()
-				end
-
-			pnl:SetTall(250 - 8 - 46)
-		end,
-
-		Leave = function(pnl)
-			pnl:SetTitle(BaseWars.LANG.LeaveFaction:upper())
-
-			local warning = pnl:Add("DLabel")
-				warning:Dock(TOP)
-				warning:SetText(BaseWars.LANG.ConfirmLeave)
-				warning:SetFont(smallFont)
-				warning:SetBright(true)
-				warning:SizeToContents()
-
-			local buttonpar = pnl:Add("Panel")
-				buttonpar:Dock(TOP)
-				buttonpar:DockMargin(0, 24, 0, 0)
-				buttonpar:SetTall(24)
-
-			local createButton = buttonpar:Add("DButton")
-				createButton:Dock(LEFT)
-				createButton:SetWide(button_width)
-				createButton:SetText(BaseWars.LANG.Leave)
-				createButton:SetImage("icon16/user_delete.png")
-				createButton:SetFont(smallFont)
-
-			function createButton:DoClick()
-				me:LeaveFaction(true)
-
-				pnl:Close()
-			end
-
-			local cancelButton = buttonpar:Add("DButton")
-				cancelButton:Dock(LEFT)
-				cancelButton:DockMargin(4, 0, 0, 0)
-				cancelButton:SetWide(button_width)
-				cancelButton:SetText(BaseWars.LANG.Nevermind)
-				cancelButton:SetImage("icon16/cross.png")
-				cancelButton:SetFont(smallFont)
-
-			function cancelButton:DoClick()
-				pnl:Close()
-			end
-
-			pnl:SetSize(270, 162 - 8 - 40)
-		end,
-	}
-}
-
-local bgColor = Color(122, 122, 122)
-local bdColor = Color(100, 100, 100)
-local bbColor = Color(255, 255, 255, 20)
-
-local function CreatePopupDialog(c, id, ...)
-	local bgPanel = vgui.Create("DPanel")
-		bgPanel:Dock(FILL)
-		function bgPanel:Paint() end
-
-	local stuff = dialogs[c] and dialogs[c][id]
-	if not stuff then return end
-
-	local pnl = vgui.Create("DFrame")
-
-	local mX, mY = gui.MousePos()
-
-    local sizex, sizey = 500, 300
-
-    if c == "Factions" and id == "Create" then --"Factions","Create"
-        sizex, sizey = 700, 300
     end
 
-	pnl:SetSize(sizex, sizey)
+    function bwmenu_frame:Paint( w, h )
 
-	function pnl:Paint(w, h)
-		self:NoClipping(false)
-		draw.RoundedBox(0, -2, -2, w + 4, h + 4, bdColor)
-		self:NoClipping(true)
+        for i = 1, 5 do
 
-		draw.RoundedBox(0, 0, 0, w, h, bgColor)
-		draw.RoundedBox(0, 0, 24, w, h - 24, bbColor)
-	end
+            Derma_DrawBackgroundBlur( self, SysTime() )
 
-	function bgPanel:OnMouseReleased()
-		if not IsValid(pnl) then
-			self:Remove()
-			return
+        end
+
+        draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 225 ) )
+
+    end
+
+    local bwmenu_tabs = vgui.Create( "DPropertySheet", bwmenu_frame )
+    bwmenu_tabs:Dock( FILL )
+    bwmenu_tabs:SetPadding( 0 )
+
+    -- function bwmenu_tabs:Paint( w, h )
+
+    --     draw.RoundedBox( 0, 0, 0, w, h, Color( 85, 85, 85, 225 ) )
+
+    -- end
+
+    for i = 1, #tabs do
+
+        local tab = tabs[i]["tab"]
+        local tab_name = tabs[i]["name"]
+        local tab_icon = tabs[i]["icon"]
+
+        local tab_tab = vgui.Create( "DPanel" )
+
+        function tab_tab:Paint( w, h )
+
+            draw.RoundedBox( 0, 0, 0, w, h, Color( 40, 40, 40, 255 ) )
+
+        end
+
+        if tab == "factions" or tab == "raids" then
+
+            local tab_list = vgui.Create( "DListView", tab_tab )
+            tab_list:Dock( FILL )
+            tab_list:DockMargin( 5, 5, 5, 40 )
+            tab_list:SetMultiSelect( false )
+            tab_list:AddColumn( "Name" )
+            tab_list:AddColumn( "Faction" )
+
+            tab_list.lines = {}
+
+            function tab_list:OnRowSelected( id, panel )
+
+                selected_line = panel:GetColumnText( 1 )
+                faction_line = panel:GetColumnText( 2 )
+
+            end
+
+            function tab_list:Think()
+
+                for k, v in pairs( player.GetHumans() ) do
+
+                    local faction = v:GetFaction()
+
+                    if v == LocalPlayer() then continue end
+
+                    if faction == "" then
+
+                        faction = "<NONE>"
+
+                    end
+
+                    if not self.lines[v] then
+
+                        local line = self:AddLine( v:Nick(), faction )
+                        self.lines[v] = line
+
+                    end
+
+                end
+
+                for k, v in pairs( self.lines ) do
+
+                    if not IsValid( v ) then
+
+                        v:Remove()
+
+                        continue
+
+                    end
+
+                    if not v.SetColumnText then
+
+                        v:Remove()
+
+                        continue
+
+                    end
+
+                    if not IsValid( k ) then
+
+                        local id = v:GetID()
+
+                        self:RemoveLine( id )
+                        self.lines[k] = nil
+
+                        continue
+
+                    end
+
+                    local faction = k:GetFaction()
+
+                    if faction == "" then
+
+                        faction = "<NONE>"
+
+                    end
+
+                    v:SetColumnText( 1, k:Nick() )
+                    v:SetColumnText( 2, faction )
+
+                end
+
+            end
+
+            local function GetPlayer( t )
+
+                for k, v in next, player.GetAll() do
+
+                    if v:Nick() == t then
+
+                        return v
+
+                    end
+
+                end
+
+                return false
+
+            end
+
+            if tab == "factions" then
+
+                local b = 1
+
+                for a = 1, #buttons["Factions"] do
+
+                    local button = buttons["Factions"][a]["button"]
+                    local button_name = buttons["Factions"][a]["name"]
+
+                    local w = 5.376
+
+                    if a >= 2 then
+
+                        w = w + ( 190 * b )
+
+                        b = b + 1
+
+                    end
+
+                    local button_button = vgui.Create( "DButton", tab_tab )
+                    button_button:SetSize( 180, 34 )
+                    button_button:SetPos( w, 448.74 )
+                    button_button:SetText( button_name )
+                    button_button:SetTextColor( color_white )
+
+                    if button_name == "Create Faction" then
+
+                        button_button.DoClick = function()
+
+                            local button_name_frame = vgui.Create( "DFrame" )
+                            button_name_frame:SetSize( 550, 250 )
+                            button_name_frame:Center()
+                            button_name_frame:SetTitle( "" )
+                            button_name_frame:MakePopup()
+
+                            local button_name_color_cube_color = Color( 45, 45, 45, 150 )
+
+                            button_name_frame.Paint = function( self, w, h )
+
+                                draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 150 ) )
+
+                                draw.RoundedBox( 0, 100, 200, 200, 40, button_name_color_cube_color )
+
+                            end
+
+                            local button_name_label = vgui.Create( "DLabel", button_name_frame )
+                            button_name_label:SetFont( "Trebuchet18" )
+                            button_name_label:SetText( "Enter the information below and maybe choose a color to create your faction!" )
+                            button_name_label:SetBright( true )
+                            button_name_label:SizeToContents()
+                            button_name_label:SetPos( 0, 25 )
+                            button_name_label:CenterHorizontal()
+                            button_name_label:SizeToContents()
+
+                            local button_name_rgb_picker = vgui.Create( "DRGBPicker", button_name_frame )
+                            button_name_rgb_picker:SetPos( 500, 50 )
+                            button_name_rgb_picker:SetSize( 40, 200 )
+
+                            local button_name_color_cube = vgui.Create( "DColorCube", button_name_frame )
+                            button_name_color_cube:SetPos( 380, 50 )
+                            button_name_color_cube:SetSize( 100, 100 )
+
+                            function button_name_rgb_picker:OnChange( col )
+
+                                local h = ColorToHSV( col )
+                                local _, s, v = ColorToHSV( button_name_color_cube:GetRGB() )
+
+                                col = HSVToColor( h, s, v )
+                                button_name_color_cube:SetColor( col )
+
+                                button_name_color_cube_color = col
+
+                            end
+
+                            function button_name_color_cube:OnUserChanged( col )
+
+                                button_name_color_cube_color = col
+
+                            end
+
+                            local button_name_faction = vgui.Create( "DTextEntry", button_name_frame )
+                            button_name_faction:SetPos( 50, 50 )
+                            button_name_faction:SetSize( 310, 20 )
+                            button_name_faction:SetPlaceholderText( "Enter the name of your faction here!" )
+
+                            local button_name_text = vgui.Create( "DTextEntry", button_name_frame )
+                            button_name_text:SetPos( 50, 75 )
+                            button_name_text:SetSize( 310, 20 )
+                            button_name_text:SetPlaceholderText( "Enter the password of your faction here!" )
+
+                            local button_name_confirm = vgui.Create( "DButton", button_name_frame )
+                            button_name_confirm:SetPos( 50, 100 )
+                            button_name_confirm:SetSize( 150, 40 )
+                            button_name_confirm:SetText( "Create Faction!" )
+                            button_name_confirm:SetTextColor( color_white )
+
+
+                            button_name_confirm.DoClick = function()
+
+                                local name, pw = string.Trim( button_name_faction:GetValue() ), string.Trim( button_name_text:GetValue() )
+
+                                if #pw < 5 or #name < 5 then Derma_Message( "You're password & faction name must contain at least 5 characters!", "FACTION NOTICE", "OK" ) return end
+
+                                me:CreateFaction( name, ( #pw >= 5 and pw ), button_name_color_cube:GetRGB() )
+
+                                button_name_frame:Close()
+
+                            end
+
+                            function button_name_confirm:Think()
+
+                                if not IsValid( bwmenu_frame ) then
+
+                                    button_name_frame:Close()
+
+                                end
+
+                            end
+
+                            function button_name_confirm:Paint( w, h )
+
+                                local hover_color
+
+                                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                            end
+
+                            local button_name_cancel = vgui.Create( "DButton", button_name_frame )
+                            button_name_cancel:SetPos( 210, 100 )
+                            button_name_cancel:SetSize( 150, 40 )
+                            button_name_cancel:SetText( "Cancel!" )
+                            button_name_cancel:SetTextColor( color_white )
+
+                            button_name_cancel.DoClick = function()
+
+                                button_name_frame:Close()
+
+                            end
+
+                            function button_name_cancel:Paint( w, h )
+
+                                local hover_color
+
+                                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                            end
+
+                        end
+
+                    elseif button_name == "Join Faction" then
+
+                        button_button.DoClick = function()
+
+                            if faction_line == nil then faction_line = "" return end
+
+                            if not me:InFaction() then
+
+                                local button_name_frame = vgui.Create( "DFrame" )
+                                button_name_frame:SetSize( 400, 150 )
+                                button_name_frame:Center()
+                                button_name_frame:SetTitle( "" )
+                                button_name_frame:MakePopup()
+
+                                button_name_frame.Paint = function( self, w, h )
+
+                                    draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 150 ) )
+
+                                end
+
+                                function button_name_frame:Think()
+
+                                    if not IsValid( bwmenu_frame ) then
+
+                                        button_name_frame:Close()
+
+                                    end
+
+                                end
+
+                                button_name_label = vgui.Create( "DLabel", button_name_frame )
+                                button_name_label:SetFont( "Trebuchet18" )
+                                button_name_label:SetText( "Enter the password to join the faction!" )
+                                button_name_label:SetBright( true )
+                                button_name_label:SizeToContents()
+                                button_name_label:SetPos( 0, 25 )
+                                button_name_label:CenterHorizontal()
+
+                                button_name_faction = vgui.Create( "DTextEntry", button_name_frame )
+                                button_name_faction:SetPos( 50, 50 )
+                                button_name_faction:SetSize( 310, 20 )
+                                button_name_faction:SetPlaceholderText( "Enter the faction name or select the faction from the menu!" )
+
+                                button_name_text = vgui.Create( "DTextEntry", button_name_frame )
+                                button_name_text:SetPos( 50, 75 )
+                                button_name_text:SetSize( 310, 20 )
+                                button_name_text:SetPlaceholderText( "Enter the password to join the faction here!" )
+
+                                if faction_line ~= "<NONE>" then
+
+                                    button_name_faction:SetValue( faction_line )
+
+                                end
+
+                                button_name_confirm = vgui.Create( "DButton", button_name_frame )
+                                button_name_confirm:SetPos( 50, 100 )
+                                button_name_confirm:SetSize( 150, 40 )
+                                button_name_confirm:SetText( "Join faction!" )
+                                button_name_confirm:SetTextColor( color_white )
+
+                                button_name_confirm.DoClick = function()
+
+                                    if me:InRaid() then return end
+
+                                    local name, pw = string.Trim( button_name_faction:GetValue() ), string.Trim( button_name_text:GetValue() )
+
+                                    me:JoinFaction( name, ( #pw > 0 and pw ), true )
+
+                                    button_name_frame:Close()
+
+                                end
+
+                                function button_name_confirm:Paint( w, h )
+
+                                    local hover_color
+
+                                    if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                    draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                                end
+
+                                button_name_cancel = vgui.Create( "DButton", button_name_frame )
+                                button_name_cancel:SetPos( 210, 100 )
+                                button_name_cancel:SetSize( 150, 40 )
+                                button_name_cancel:SetText( "Cancel!" )
+                                button_name_cancel:SetTextColor( color_white )
+
+                                button_name_cancel.DoClick = function()
+
+                                    button_name_frame:Close()
+
+                                end
+
+                                function button_name_cancel:Paint( w, h )
+
+                                    local hover_color
+
+                                    if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                    draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                                end
+
+                            elseif me:InFaction() then
+
+                                Derma_Message( "You're already in a faction!", "Faction Notice", "OK" )
+
+                            end
+
+                        end
+
+                    elseif button_name == "Leave Faction" then
+
+                        button_button.DoClick = function()
+
+                            if not me:InFaction() then
+
+                                Derma_Message( "You're not in a faction!", "Faction Notice", "OK" )
+
+                            elseif me:InFaction() then
+
+                                local button_name_frame = vgui.Create( "DFrame" )
+                                button_name_frame:SetSize( 400, 150 )
+                                button_name_frame:Center()
+                                button_name_frame:SetTitle( "" )
+                                button_name_frame:MakePopup()
+
+                                button_name_frame.Paint = function( self, w, h )
+
+                                    draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 150 ) )
+
+                                end
+
+                                function button_name_frame:Think()
+
+                                    if not IsValid( bwmenu_frame ) then
+
+                                        button_name_frame:Close()
+
+                                    end
+
+                                end
+
+                                local button_name_label = vgui.Create( "DLabel", button_name_frame )
+                                button_name_label:SetFont( "Trebuchet18" )
+                                button_name_label:SetText( "Are you sure you want to leave or disband this faction?" )
+                                button_name_label:SetBright( true )
+                                button_name_label:SizeToContents()
+                                button_name_label:Center()
+
+                                local button_name_confirm = vgui.Create( "DButton", button_name_frame )
+                                button_name_confirm:SetPos( 50, 100 )
+                                button_name_confirm:SetSize( 150, 40 )
+                                button_name_confirm:SetText( "Yes, leave!" )
+                                button_name_confirm:SetTextColor( color_white )
+
+                                button_name_confirm.DoClick = function()
+
+                                    me:LeaveFaction( true )
+
+                                    button_name_frame:Close()
+
+                                end
+
+                                function button_name_confirm:Paint( w, h )
+
+                                    local hover_color
+
+                                    if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                    draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                                end
+
+                                local button_name_cancel = vgui.Create( "DButton", button_name_frame )
+                                button_name_cancel:SetPos( 210, 100 )
+                                button_name_cancel:SetSize( 150, 40 )
+                                button_name_cancel:SetText( "No, cancel!" )
+                                button_name_cancel:SetTextColor( color_white )
+
+                                button_name_cancel.DoClick = function()
+
+                                    button_name_frame:Close()
+
+                                end
+
+                                function button_name_cancel:Paint( w, h )
+
+                                    local hover_color
+
+                                    if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                                    draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                                end
+
+                            end
+
+                        end
+
+                    elseif button_name == "Invite To Faction" then
+
+                        button_button.DoClick = function()
+
+                            if me:InFaction( me:GetFaction(), true ) then
+
+                                net.Start( "InvitePlayerToFaction" )
+
+                                    net.WriteString( selected_line )
+
+                                net.SendToServer()
+
+                            end
+
+                        end
+
+                    elseif button_name == "Kick From Faction" then
+
+                        button_button.DoClick = function()
+
+                            if me:InFaction( me:GetFaction(), true ) then
+
+                                net.Start( "CheckPlayerBeforeKick" )
+
+                                    net.WriteString( selected_line )
+
+                                net.SendToServer()
+
+                            end
+
+                        end
+
+                    end
+
+                    function button_button:Paint( w, h )
+
+                        local hover_color
+
+                        if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                        draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                    end
+
+                end
+
+            elseif tab == "raids" then
+
+                local b = 1
+
+                for a = 1, #buttons["Raids"] do
+
+                    local button = buttons["Raids"][a]["button"]
+                    local button_name = buttons["Raids"][a]["name"]
+
+                    local w = 284.16
+
+                    if a >= 2 then
+
+                        w = w + ( 190 * b )
+
+                        b = b + 1
+
+                    end
+
+                    local button_button = vgui.Create( "DButton", tab_tab )
+                    button_button:SetSize( 180, 34 )
+                    button_button:SetPos( w, 448.74 )
+                    button_button:SetText( button_name )
+                    button_button:SetTextColor( color_white )
+
+                    if button_name == "Start Raid" then
+
+                        button_button.DoClick = function()
+
+                            me:StartRaid( GetPlayer( selected_line ) )
+
+                        end
+
+                    elseif button_name == "Concede Raid" then
+
+                        button_button.DoClick = function()
+
+                            me:ConceedRaid()
+
+                        end
+
+                    end
+
+                    function button_button:Paint( w, h )
+
+                        local hover_color
+
+                        if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                        draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                    end
+
+                end
+
+            end
+
+        elseif tab == "rules" or tab == "guide" then
+
+            local tab_html = vgui.Create( "DHTML", tab_tab )
+            tab_html:Dock( FILL )
+            tab_html:OpenURL( tabs[i]["link"] )
+
 		end
 
-		pnl:Close()
-	end
+        bwmenu_tabs:AddSheet( tab_name, tab_tab, tab_icon )
 
-	function pnl:Close()
-		bgPanel:Remove()
+    end
 
-		self:SizeTo(0, 0, 0.1, 0, -1, function(_, pnl)
-			if IsValid(pnl) then pnl:Remove() end
-		end)
-	end
+    for k, v in ipairs( bwmenu_tabs.Items ) do
 
-	pnl:SetTitle("")
-	stuff(pnl, ...)
+        if not v.Tab then continue end
 
-	pnl:SetPos(mX + 16, mY + 16)
-	pnl.lblTitle:SetFont(smallFont)
-	pnl.btnMaxim:Hide()
-	pnl.btnMinim:Hide()
+        v.Tab.Paint = function( self, w, h )
 
-	local x, y = pnl:GetPos()
-	local w, h = pnl:GetSize()
+            draw.RoundedBox( 0, 0, 0, w, h, Color( 85, 85, 85, 225 ) )
 
-	if x + w > ScrW() then
-		pnl.x = ScrW() - w
-	end
+        end
 
-	if y + h > ScrH() then
-		pnl.y = ScrH() - h
-	end
+    end
 
-	pnl:MakePopup()
+    local function inQuad( fraction, beginning, change )
 
-	pnl:SetSize(0, 0)
-	pnl:SizeTo(w, h, 0.1, 0, -1, function() end)
+        return change * ( fraction ^ 2 ) + beginning
 
-	return pnl
+    end
+
+    local bwmenu_anim = Derma_Anim( "EaseInQuad", bwmenu_frame, function( pnl, anim, delta, data )
+
+        pnl:SetPos( 0, inQuad( delta, -ScrH() / 2, ScrH() / 2 * 2 - ScrH() * 0.25 ) )
+        pnl:CenterHorizontal()
+
+    end )
+
+    if open_tab == nil then
+
+        bwmenu_anim:Start( 0.25 )
+
+    end
+
+    bwmenu_frame.Think = function( self )
+
+        if bwmenu_anim:Active() then
+
+            bwmenu_anim:Run()
+
+        end
+
+    end
+
+    if open_tab ~= nil then
+
+        bwmenu_frame:Center()
+        bwmenu_tabs:SetActiveTab( bwmenu_tabs:GetItems()[open_tab].Tab )
+
+    end
+
 end
 
-local function MakeMenu(mainFrame, tabPanel, ftionTab, raidsTab, rulesTab--[[, infoTab]])
-	function mainFrame:OpenMenuThing(c, i, ...)
-		if IsValid(self.menuthing) then
-			self.menuthing:Remove()
-			self.menuthing = nil
-		end
+hook.Add( "PlayerButtonUp", "bwmenu_toggle", function( ply, button )
 
-		self.menuthing = CreatePopupDialog(c, i, ...)
-	end
+    if button == KEY_F3 and IsFirstTimePredicted() then
 
-	function mainFrame:OnClose()
-		if IsValid(self.menuthing) then
-			self.menuthing:Remove()
-			self.menuthing = nil
-		end
-	end
+        bwmenu()
 
-	do -- Factions tab
-		ftionTab:DockPadding(16, 8, 16, 16)
+    end
 
-		local ftionLabel = ftionTab:Add("DLabel")
-			ftionLabel:Dock(TOP)
-			ftionLabel:SetText(BaseWars.LANG.Factions)
-			ftionLabel:SetFont(bigFont)
-			ftionLabel:SetDark(true)
-			-- ftionLabel:SetExpensiveShadow(2, shadowColor)
-			ftionLabel:SizeToContents()
-
-		local yourfLabel = ftionTab:Add("DLabel")
-			yourfLabel:SetPos(128 + 16, 20)
-			yourfLabel:SetText("")
-			yourfLabel:SetFont(medFont)
-			yourfLabel:SetDark(true)
-			yourfLabel:SizeToContents()
-
-			function yourfLabel:Think()
-				local inFaction, myFaction = me:InFaction(), me:GetFaction()
-
-				if not inFaction then
-					self:SetText(BaseWars.LANG.YouNotFaction)
-				else
-					self:SetText(BaseWars.LANG.YourFaction .. myFaction)
-				end
-
-				self:SizeToContents()
-			end
-
-		local plyList = MakePlayerList(ftionTab)
-
-		local btns = ftionTab:Add("DPanel")
-			btns:Dock(BOTTOM)
-			btns:DockMargin(0, 8, 0, 0)
-			btns:SetTall(32)
-
-			function btns:Paint() end
-
-		local btnCreate = btns:Add("DButton")
-			btnCreate:Dock(LEFT)
-			btnCreate:SetWide(button_width)
-			btnCreate:SetImage("icon16/star.png")
-			btnCreate:SetText(BaseWars.LANG.CreateFaction)
-
-			function btnCreate:DoClick()
-				mainFrame:OpenMenuThing("Factions", "Create")
-			end
-
-		local btnJoin = btns:Add("DButton")
-			btnJoin:DockMargin(8, 0, 0, 0)
-			btnJoin:Dock(LEFT)
-			btnJoin:SetWide(button_width)
-			btnJoin:SetImage("icon16/user_add.png")
-			btnJoin:SetText(BaseWars.LANG.JoinFaction)
-
-			function btnJoin:DoClick()
-				local val
-				local sel = plyList:GetLine(plyList:GetSelectedLine())
-
-				if IsValid(sel) then
-					val = sel:GetColumnText(2)
-				end
-
-				mainFrame:OpenMenuThing("Factions","Join",val)
-			end
-
-		local btnLeave = btns:Add("DButton")
-			btnLeave:DockMargin(8, 0, 0, 0)
-			btnLeave:Dock(LEFT)
-			btnLeave:SetWide(button_width)
-			btnLeave:SetImage("icon16/cancel.png")
-			btnLeave:SetText(BaseWars.LANG.LeaveFaction)
-
-			function btnLeave:DoClick()
-				mainFrame:OpenMenuThing("Factions","Leave")
-			end
-
-			function btnLeave:Think()
-				if me:InFaction() then self:SetDisabled(false) else self:SetDisabled(true) end
-			end
-	end
-
-	do -- Raids tab
-		raidsTab:DockPadding(16, 8, 16, 16)
-
-		local raidLabel = raidsTab:Add("DLabel")
-			raidLabel:Dock(TOP)
-			raidLabel:SetText(BaseWars.LANG.Raids)
-			raidLabel:SetFont(bigFont)
-			raidLabel:SetDark(true)
-			-- raidLabel:SetExpensiveShadow(2, shadowColor)
-			raidLabel:SizeToContents()
-
-		local yourfLabel = raidsTab:Add("DLabel")
-			yourfLabel:SetPos(128 + 16, 20)
-			yourfLabel:SetText("")
-			yourfLabel:SetFont(medFont)
-			yourfLabel:SetDark(true)
-			yourfLabel:SizeToContents()
-
-			function yourfLabel:Think()
-				local inFaction, myFaction = me:InFaction(), me:GetFaction()
-
-				if not inFaction then
-					self:SetText(BaseWars.LANG.YouNotFaction)
-				else
-					self:SetText(BaseWars.LANG.YourFaction .. myFaction)
-				end
-
-				self:SizeToContents()
-			end
-
-		local plyList = MakePlayerList(raidsTab)
-
-		local btns = raidsTab:Add("DPanel")
-			btns:Dock(BOTTOM)
-			btns:DockMargin(0, 8, 0, 0)
-			btns:SetTall(32)
-
-			function btns:Paint() end
-
-		local btnStart = btns:Add("DButton")
-			btnStart:Dock(LEFT)
-			btnStart:SetWide(button_width)
-			btnStart:SetImage("icon16/building_go.png")
-			btnStart:SetText(BaseWars.LANG.StartRaid)
-
-			function btnStart:DoClick()
-				me:StartRaid(self.Enemy)
-			end
-
-			function btnStart:Think()
-				local Enemy 	= plyList.SelectedPly
-				Enemy = BaseWars.Ents:ValidPlayer(Enemy) and Enemy
-
-				local InFac 	= me:InFaction()
-				local InFac2 	= Enemy and Enemy:InFaction() and not (Enemy:InFaction(me:GetFaction()))
-
-				if not Enemy or (InFac and not InFac2) or (InFac2 and not InFac) then self:SetDisabled(true) else self:SetDisabled(false) self.Enemy = Enemy end
-			end
-
-		local btnConceed = btns:Add("DButton")
-			btnConceed:DockMargin(8, 0, 0, 0)
-			btnConceed:Dock(LEFT)
-			btnConceed:SetWide(button_width)
-			btnConceed:SetImage("icon16/building_error.png")
-			btnConceed:SetText(BaseWars.LANG.ConceedRaid)
-
-			function btnConceed:DoClick()
-				me:ConceedRaid()
-			end
-
-			function btnConceed:Think()
-				local Disabled = not (me:InRaid() and (not me:InFaction() or me:InFaction(nil, true)))
-
-				self:SetDisabled(Disabled)
-			end
-	end
-
-	do -- Rules tab
-		rulesTab:DockPadding(16, 8, 16, 16)
-
-		local rulesLabel = rulesTab:Add("DLabel")
-			rulesLabel:Dock(TOP)
-			rulesLabel:SetText(BaseWars.LANG.Rules)
-			rulesLabel:SetFont(bigFont)
-			rulesLabel:SetDark(true)
-			-- rulesLabel:SetExpensiveShadow(2, shadowColor)
-			rulesLabel:SizeToContents()
-
-		local rulesHTML = rulesTab:Add("DHTML")
-			rulesHTML:Dock(FILL)
-			if BaseWars.Config.Rules.IsHTML then
-				rulesHTML:SetHTML(BaseWars.Config.Rules.HTML or [[Error Loading HTML]])
-			else
-				rulesHTML:OpenURL(BaseWars.Config.Rules.HTML)
-			end
-	end
-
-	--[[do -- Info tab
-		infoTab:DockPadding(16, 8, 16, 16)
-
-		local rulesHTML = infoTab:Add("DHTML")
-			rulesHTML:Dock(FILL)
-			if BaseWars.Config.HelpInfo.IsHTML then
-				rulesHTML:SetHTML(BaseWars.Config.HelpInfo.HTML or "Error Loading HTML")
-			else
-				rulesHTML:OpenURL(BaseWars.Config.HelpInfo.HTML)
-			end
-	end]]
-
-	hook.Run("BaseWars_GenerateMenu", mainFrame, tabPanel)
-
-	mainFrame:SetVisible(false)
-
-	return mainFrame
-end
-
-local pnl
-
-local function MakeNotExist()
-	if pnl and IsValid(pnl) then return end
-
-	pnl = MakeMenu(PrepMenu())
-	pnl:Hide()
-end
-
-local a
-
-hook.Add("Think", "BaseWars.Menu.Open", function()
-	me = LocalPlayer()
-
-    local wep = me:GetActiveWeapon()
-	if wep ~= NULL and wep.CW20Weapon and wep.dt.State == (CW_CUSTOMIZE or 4) then return end
-
-	if input.IsKeyDown(KEY_F3) then
-		if not a then
-			MakeNotExist()
-
-			a = true
-
-			if pnl:IsVisible() then
-				pnl:Close()
-			else
-				pnl:Show()
-			end
-		end
-	else
-		a = nil
-	end
-end)
-
-concommand.Add("bw_togglemenu", function()
-	MakeNotExist()
-
-	if pnl:IsVisible() then
-		pnl:Close()
-	else
-		pnl:Show()
-	end
-end)
+end )

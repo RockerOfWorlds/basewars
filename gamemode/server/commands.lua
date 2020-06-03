@@ -284,6 +284,10 @@ BaseWars.Commands.AddCommand({"forums", "forum", "f"}, function(ply)
 	ply:SendLua([[gui.OpenURL"]] .. BaseWars.Config.Forums .. [["]])
 end, false)
 
+BaseWars.Commands.AddCommand({"rules"}, function(ply)
+	ply:SendLua([[gui.OpenURL"]] .. BaseWars.Config.Rules .. [["]])
+end, false)
+
 BaseWars.Commands.AddCommand({"addons", "workshop", "collection", "content"}, function(ply)
 	ply:SendLua([[gui.OpenURL"]] .. BaseWars.Config.Workshop .. [["]])
 end, false)
@@ -294,8 +298,8 @@ end, false)
 
 
 BaseWars.Commands.AddCommand({"givemoney", "pay", "moneygive"}, function(caller, line, ply, amount)
-	return false, "/pay has been removed since it was only ever used for abuse and stoping abuse made the command borderline useless."
-	--[[if not easylua then return false, "easylua is required for this command, tell your dev to change how it works or install easylua" end
+	if BaseWars.Config.DisableGiveMoney then return false, "The ability to give money has been disabled on this server." end
+	if not easylua then return false, "easylua is required for this command, tell your dev to change how it works or install easylua" end
 
 	if not amount then return false, BaseWars.LANG.InvalidAmount end
 
@@ -339,7 +343,7 @@ BaseWars.Commands.AddCommand({"givemoney", "pay", "moneygive"}, function(caller,
 	caller:ChatPrint(Gave)
 	ply:ChatPrint(Given)
 
-    caller.pleasestop = CurTime() + 3]]
+    caller.pleasestop = CurTime() + 3
 end, false)
 
 BaseWars.Commands.AddCommand({"dropmoney"}, function(ply)
