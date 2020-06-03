@@ -89,7 +89,7 @@ if SERVER then
 		local phys = e:GetPhysicsObject()
 
 		if IsValid(phys) then
-			
+
 			phys:AddVelocity(ang:Forward() * 100)
 
 		end
@@ -123,11 +123,11 @@ if SERVER then
 			if not IsValid(trace.Entity) then return end
 
 			if self.Busy or activator:GetMoney() < self.Items.soda.Price then
-				
+
 				self:EmitSound("buttons/button10.wav")
 
 			return end
-			
+
 			self:EmitSound("buttons/blip1.wav")
 			self.BuyingPlayer = activator
 			self.Busy = true
@@ -137,23 +137,23 @@ if SERVER then
 		end
 
 	end
-	
+
 	function ENT:CheckUsable()
-	
+
 		if self.Busy then return false end
-	
+
 	end
 
 	function ENT:ThinkFunc()
 
 		if self.Busy then
-			
+
 			local ctime = CurTime() - self.Time
 
 			for func, stage in next, self.Stages do
-				
+
 				if not self.PlayedStages[stage] and stage <= math.Round(ctime, 2) + 0.1 then
-					
+
 					func(self, self.BuyingPlayer, self.Items[self.Item], self.Item)
 					self.PlayedStages[stage] = true
 
@@ -170,10 +170,10 @@ if SERVER then
 		if self.Time and CurTime() - self.Time >= 4 then
 
 			self.Busy = nil
-		
-		end		
+
+		end
 
 
 	end
-	
+
 end

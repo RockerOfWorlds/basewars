@@ -22,6 +22,7 @@ ENT.IsExplosive = true
 ENT.Cluster = false
 ENT.ClusterAmt = 0
 ENT.ClusterClass = ""
+ENT.InGameBombUpgradeLevel = 0
 
 local math_floor, math_ceil, math_max, math_min, math_random = math.floor, math.ceil, math.max, math.min, math.random
 
@@ -75,6 +76,8 @@ if SERVER then
 		self:EmitSound(plant)
 		self:StartCountdown()
 
+		self.InGameBombUpgradeLevel = self:CPPIGetOwner():GetPrestige( "perk", "bombclusterperk" )
+
 		self:SetNW2Bool("IsArmed", true)
 	end
 
@@ -97,6 +100,17 @@ if SERVER then
 
 		local exp = ents.Create("env_explosion")
 
+		if not self.Cluster and self.InGameBombUpgradeLevel >= 1 then
+
+			self.Cluster = true
+			self.ClusterAmt = BaseWars.Config.Perks["bombclusterperk"]["Additions"] * self.InGameBombUpgradeLevel
+
+		elseif self.Cluster and self.InGameBombUpgradeLevel >= 1 then
+
+			self.ClusterAmt = self.ClusterAmt + ( BaseWars.Config.Perks["bombclusterperk"]["Additions"] * self.InGameBombUpgradeLevel )
+
+		end
+
 		exp:SetKeyValue("iMagnitude", self.ExplodeRadius)
 		exp:SetKeyValue("spawnflags", 64)
 		exp:SetPos(self:GetPos())
@@ -105,6 +119,12 @@ if SERVER then
 		exp:Fire("explode")
 		exp.Owner = self.Owner
 		exp:SetOwner(self.Owner)
+
+		if self.Owner:GetNWInt( "InGameC4Planted" ) >= 1 then
+
+			self.Owner:SetNWInt( "InGameC4Planted", self.Owner:GetNWInt( "InGameC4Planted" ) - 1 )
+
+		end
 
 		self:ExplodeEffects()
 

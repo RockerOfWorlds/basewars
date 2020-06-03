@@ -1,12 +1,7 @@
 # Next Update
-## Planned Release Date - 6/3/2020 - 6/5/2020
+## Planned Release Date - 6/4/2020 - 6/10/2020
 
-### Currently Planned to contain
+### The currently planned features for this update:
 
-* Prestige & Prestige Points
-* Prestige Perks & Prestige Titles
-* Defense Towers ( Heal, Freeze & Acid ) ( Originally made by Q2F2 )
-* Upgradeable Money Vaults
-* Version Checker
-* Adding Anti Raid Interference with a Config Option to Enable/Disable
+* Prestige Titles
 * More things than this are planned to be added.

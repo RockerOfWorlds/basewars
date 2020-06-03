@@ -90,6 +90,15 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 	ply:SetXP(amt)
 	ply:AddXP(amt)
 
+-- Manipulating players prestige
+-- The type field can either be prestige, points or perk
+-- All Perk Names/ID's are available in the Config. ( Example: healthperk )
+	ply:GivePrestige( type, amount, perk )
+	ply:SetPrestige( type, amount, perk )
+	ply:TakePrestige( type, amount, perk )
+	ply:ResetPrestigePerks()
+	ply:Prestige()
+
 -- Manipulating players karma
 	ply:AddKarma(amt)
 	ply:SetKarma(amt)

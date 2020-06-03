@@ -15,6 +15,9 @@ ENT.PresetMaxHealth = 1000
 
 ENT.CollectInterval = 10 -- also interest interval for sake of simplicity
 ENT.InterestRate    = 0.002
+ENT.StartingMoney 	= 25000000000
+
+ENT.IsValidRaidable = true
 
 function ENT:Draw()
 	self.FontColor = HSVToColor(CurTime() % 6 * 60, 1, 1)

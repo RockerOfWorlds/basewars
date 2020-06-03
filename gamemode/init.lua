@@ -113,6 +113,16 @@ function GM:OnEntityCreated(ent)
 				HP = 400 * BaseWars.Config.UniversalPropConstant
 			end
 
+			if not ent:IsWorld() then
+
+				if IsValid( ent:CPPIGetOwner() ) and ent:CPPIGetOwner():GetPrestige( "perk", "prophealthperk" ) >= 1 then
+
+					hp = hp + ( BaseWars.Config.Perks["prophealthperk"]["Additions"] * ent:CPPIGetOwner():GetPrestige( "perk", "prophealthperk" ) )
+
+				end
+
+			end
+
 			ent:SetHealth(HP)
 			ent:SetMaxHealth(HP)
 			ent.DestructableProp = true
@@ -206,6 +216,12 @@ function GM:EntityTakeDamage(ent, dmginfo)
 		local ActualDmg = Damage * Scale
 		local HP = ent:Health()
 
+		if Attacker:IsPlayer() and Attacker:GetPrestige( "perk", "entitydamageperk" ) >= 1 then
+
+			ActualDmg = ActualDmg + ( BaseWars.Config.Perks["entitydamageperk"]["Additions"] * Attacker:GetPrestige( "perk", "entitydamageperk" ) )
+
+		end
+
 		ent:SetHealth(HP - ActualDmg)
 
 		if ent:Health() <= 0 then
@@ -246,6 +262,28 @@ function GM:EntityTakeDamage(ent, dmginfo)
 
 	end
 
+	if Player and Attacker:IsPlayer() then
+
+		if BaseWars.Config.Raid.AntiRaidInterference then
+
+			if ent:InRaid() and not Attacker:InRaid() then
+
+				dmginfo:SetDamage( 0 )
+
+				return
+
+			elseif Attacker:InRaid() and not ent:InRaid() then
+
+				dmginfo:SetDamage( 0 )
+
+				return
+
+			end
+
+		end
+
+	end
+
 	if ent:IsPlayer() then
 		if not Attacker:IsPlayer() and dmginfo:IsDamageType(DMG_CRUSH) and (Attacker:IsWorld() or (IsValid(Attacker) and not Attacker:CreatedByMap())) then
 			dmginfo:SetDamage(0)
@@ -268,7 +306,7 @@ function GM:EntityTakeDamage(ent, dmginfo)
 
 		local TakeDamage = Damage * Scale
 
-		if TakeDamage >= ent:Health() and ent:HasDrug("Shield") and not ent.ShieldOn then
+		if TakeDamage >= ent:Health() and ( ent:HasDrug("Shield") or ent:GetPrestige( "perk", "adrenalineperk" ) ) and ( not ent.ShieldOn or ent:GetPrestige( "perk", "adrenalineperk" ) ) then
 			ent.ShieldOn = true
 			ent:RemoveDrug("Shield")
 

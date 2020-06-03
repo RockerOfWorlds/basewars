@@ -25,7 +25,7 @@ function ENT:SpewGas()
 
 end
 function ENT:Think()
-	
+
 	if CLIENT then return end
 
 	if CurTime() > self.Curtime + 4 then

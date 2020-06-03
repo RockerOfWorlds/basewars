@@ -5,6 +5,13 @@ surface.CreateFont( "Trebuchet_new", {
 
 } )
 
+surface.CreateFont( "Trebuchet24", {
+
+    font = "Trebuchet MS",
+    size = 24
+
+} )
+
 local button_color = Color( 70, 70, 70 )
 local button_hover_color = Color( 75, 75, 75 )
 
@@ -12,7 +19,7 @@ local function bwmenu( open_tab, open_tab2 )
 
     if IsValid( bwmenu_frame ) then bwmenu_frame:Close() return end
 
-    local tabs = { { ["tab"] = "factions", ["name"] = "Factions", ["icon"] = "icon16/group.png" }, { ["tab"] = "raids", ["name"] = "Raids", ["icon"] = "icon16/error.png" }, { ["tab"] = "rules", ["name"] = "Rules", ["icon"] = "icon16/page_white.png", ["link"] = BaseWars.Config.RulesURL }, { ["tab"] = "guide", ["name"] = "Guide", ["icon"] = "icon16/note.png", ["link"] = "https://forums.notfound.tech/index.php?threads/english-basewars-guide.136/" } } -- { ["tab"] = "prestige", ["name"] = "Prestige", ["icon"] = "icon16/clock.png" }, { ["tab"] = "staff", ["name"] = "Staff", ["icon"] = "icon16/shield.png", ["link"] = "https://notfound.tech/staff" }, { ["tab"] = "leaderboard", ["name"] = "Leaderboard", ["icon"] = "icon16/award_star_gold_1.png", ["link"] = "https://notfound.tech/leaderboard" }, { ["tab"] = "settings", ["name"] = "Settings", ["icon"] = "icon16/cog.png" } }
+    local tabs = { { ["tab"] = "factions", ["name"] = "Factions", ["icon"] = "icon16/group.png" }, { ["tab"] = "raids", ["name"] = "Raids", ["icon"] = "icon16/error.png" }, { ["tab"] = "rules", ["name"] = "Rules", ["icon"] = "icon16/page_white.png", ["link"] = BaseWars.Config.RulesURL }, { ["tab"] = "guide", ["name"] = "Guide", ["icon"] = "icon16/note.png", ["link"] = BaseWars.Config.Guide }, { ["tab"] = "prestige", ["name"] = "Prestige", ["icon"] = "icon16/clock.png" } --[[, { ["tab"] = "staff", ["name"] = "Staff", ["icon"] = "icon16/shield.png", ["link"] = "https://notfound.tech/staff" }, { ["tab"] = "leaderboard", ["name"] = "Leaderboard", ["icon"] = "icon16/award_star_gold_1.png", ["link"] = "https://notfound.tech/leaderboard" }, { ["tab"] = "settings", ["name"] = "Settings", ["icon"] = "icon16/cog.png" } ]] }
     local buttons = { ["Factions"] = { { ["button"] = "create_faction", ["name"] = "Create Faction" }, { ["button"] = "join_faction", ["name"] = "Join Faction" }, { ["button"] = "leave_faction", ["name"] = "Leave Faction" }, { ["button"] = "invite_faction", ["name"] = "Invite To Faction" }, { ["button"] = "kick_faction", ["name"] = "Kick From Faction" } }, ["Raids"] = { { ["button"] = "start_raid", ["name"] = "Start Raid" }, { ["button"] = "concede_raid", ["name"] = "Concede Raid" } } }
 
     local me = LocalPlayer()
@@ -634,6 +641,517 @@ local function bwmenu( open_tab, open_tab2 )
             tab_html:OpenURL( tabs[i]["link"] )
 
 		end
+
+        if tab == "prestige" then
+
+            local prestige_perks_table = { { ["button"] = "ghostperk" }, { ["button"] = "healthperk" }, { ["button"] = "armorperk" }, { ["button"] = "speedperk" }, { ["button"] = "soundperk" }, { ["button"] = "entitydamageperk" }, { ["button"] = "blowtorchpowerperk" }, { ["button"] = "bombclusterperk" }, { ["button"] = "c4limitperk" }, { ["button"] = "entityhealthperk" }, { ["button"] = "vaultinterestperk" }, { ["button"] = "xpgainperk" }, { ["button"] = "adrenalineperk" }, { ["button"] = "printercapacityperk" }, { ["button"] = "vaultcapacityperk" }, { ["button"] = "prophealthperk" } }
+            local prestige_title_table = { { ["name"] = "The Waffle King Was Here", ["cost"] = 100000000, ["color"] = "255 203 0 255", ["id"] = 1 }, { ["name"] = "Beta Tester", ["cost"] = 100, ["color"] = "28 150 199 255", ["id"] = 2 } }
+
+            local prestige_tabs = vgui.Create( "DPanel", tab_tab )
+            prestige_tabs:SetPos( 192, 32.4 )
+            prestige_tabs:SetSize( 768, 453.6 )
+
+            local prestige_perks_frame = vgui.Create( "DPanel", prestige_tabs )
+            prestige_perks_frame:Dock( FILL )
+
+            prestige_perks_frame.Paint = function( self, w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 255 ) )
+
+            end
+
+            local prestige_frame = vgui.Create( "DPanel", prestige_tabs )
+            prestige_frame:Dock( FILL )
+            prestige_frame:SetVisible( false )
+
+            prestige_frame.Paint = function( self, w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 255 ) )
+
+            end
+
+            local prestige_title_frame = vgui.Create( "DPanel", prestige_tabs )
+            prestige_title_frame:Dock( FILL )
+            prestige_title_frame:SetVisible( false )
+
+            prestige_title_frame.Paint = function( self, w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 255 ) )
+
+            end
+
+            local function change_panel( panel )
+
+                if not panel:IsVisible() then
+
+                    prestige_perks_frame:SetVisible( false )
+                    prestige_frame:SetVisible( false )
+                    prestige_title_frame:SetVisible( false )
+
+                    panel:SetVisible( true )
+
+                end
+
+            end
+
+            if open_tab2 == "title" then
+
+                change_panel( prestige_title_frame )
+
+            end
+
+            local prestige_title_scroll = vgui.Create( "DScrollPanel", prestige_title_frame )
+            prestige_title_scroll:Dock( FILL )
+
+            local prestige_perks_scroll = vgui.Create( "DScrollPanel", prestige_perks_frame )
+            prestige_perks_scroll:Dock( FILL )
+
+            local prestige_perks_scroll_bar = prestige_perks_scroll:GetVBar()
+
+            function prestige_perks_scroll_bar:Paint( w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 255, 255, 0 ) )
+
+            end
+
+            function prestige_perks_scroll_bar.btnUp:Paint( w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 255, 255, 0 ) )
+
+            end
+
+            function prestige_perks_scroll_bar.btnDown:Paint( w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 255, 255, 0 ) )
+
+            end
+
+            function prestige_perks_scroll_bar.btnGrip:Paint( w, h )
+
+                draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 255, 255, 0 ) )
+
+            end
+
+            local b = 1
+            local c = 1
+
+            for d = 1, #prestige_perks_table do
+
+                local prestige_button = prestige_perks_table[d]["button"]
+                local prestige_name = BaseWars.Config.Perks[prestige_button]["Name"]
+                local prestige_description = BaseWars.Config.Perks[prestige_button]["Description"]
+                local prestige_cost = BaseWars.Config.Perks[prestige_button]["Cost"]
+                local prestige_max = BaseWars.Config.Perks[prestige_button]["Max"]
+                local prestige_current = tonumber( LocalPlayer():GetPrestige( "perk", prestige_button ) )
+
+                if not BaseWars.Config.Perks[prestige_button]["Enabled"] then continue end
+
+                local h = 16.2
+                local w = 15.36
+
+                if d >= 2 then
+
+                    h = w + ( 175 * b )
+
+                    b = b + 1
+
+                end
+
+                if d >= #prestige_perks_table / 2 + 1 then
+
+                    if d == #prestige_perks_table / 2 + 1 then
+
+                        h = 16.2
+
+                    elseif d > #prestige_perks_table / 2 + 1 then
+
+                        h = 16.2 + ( 175 * c )
+
+                        c = c + 1
+
+                    end
+
+                    w = 384
+
+                end
+
+                local prestige_button_frame = prestige_perks_scroll:Add( "DPanel" )
+                prestige_button_frame:SetSize( 350, 125 )
+                prestige_button_frame:SetPos( w, h )
+
+                prestige_button_frame.Paint = function( self, w, h )
+
+                    draw.RoundedBox( 5, 0, 0, w, h, color_white )
+
+                end
+
+                local prestige_button_status = vgui.Create( "DPanel", prestige_button_frame )
+                prestige_button_status:SetSize( 250, 25 )
+                prestige_button_status:SetPos( 0, 45 )
+                prestige_button_status:CenterHorizontal()
+
+                local prestige_current2
+
+                if prestige_current == 5 then
+
+                    prestige_current2 = 250
+
+                elseif prestige_current == 4 then
+
+                    prestige_current2 = 200
+
+                elseif prestige_current == 3 then
+
+                    prestige_current2 = 150
+
+                elseif prestige_current == 2 then
+
+                    prestige_current2 = 100
+
+                elseif prestige_current == 1 then
+
+                    prestige_current2 = 50
+
+                end
+
+                prestige_button_status.Paint = function( self, w, h )
+
+                    draw.RoundedBox( 8, 0, 0, w, h, Color( 85, 85, 85, 75 ) )
+
+                    if prestige_current == prestige_max then
+
+                        draw.RoundedBoxEx( 8, 0, 0, 250, h, Color( 125, 0, 0 ), true, true, true, true )
+
+                    elseif prestige_current == 0 then
+
+                        draw.RoundedBoxEx( 8, 0, 0, 0, h, Color( 125, 0, 0 ), true, true, true, true )
+
+                    elseif prestige_current ~= prestige_max then
+
+                        draw.RoundedBoxEx( 8, 0, 0, prestige_current2, h, Color( 125, 0, 0 ), true, false, true, false )
+
+                    end
+
+                    for e = 1, prestige_max do
+
+                        if prestige_max == 1 then return end
+
+                        draw.RoundedBox( 0, prestige_max * 10 * e, 0, 1, h, Color( 45, 45, 45 ) )
+
+                    end
+
+                end
+
+                local prestige_button_label = vgui.Create( "DLabel", prestige_button_frame )
+                prestige_button_label:SetPos( 5, 5 )
+                prestige_button_label:SetFont( "Trebuchet24" )
+                prestige_button_label:SetText( prestige_name )
+                prestige_button_label:SizeToContents()
+                prestige_button_label:SetColor( Color( 85, 85, 85 ) )
+
+                local prestige_button_current = vgui.Create( "DLabel", prestige_button_frame )
+                prestige_button_current:SetPos( 315, 5 )
+                prestige_button_current:SetFont( "Trebuchet24" )
+                prestige_button_current:SetText( prestige_current .. "/" .. prestige_max )
+                prestige_button_current:SizeToContents()
+                prestige_button_current:SetColor( Color( 85, 85, 85 ) )
+
+                local prestige_button_description = vgui.Create( "DLabel", prestige_button_frame )
+                prestige_button_description:SetPos( 0, 75 )
+                prestige_button_description:SetFont( "Trebuchet18" )
+                prestige_button_description:SetText( prestige_description )
+                prestige_button_description:SizeToContents()
+                prestige_button_description:CenterHorizontal()
+                prestige_button_description:SetColor( Color( 85, 85, 85 ) )
+
+                local perk_status = "Increase Perk"
+
+                if prestige_max == 1 then
+
+                    perk_status = "Unlock Perk"
+
+                end
+
+                if prestige_current < prestige_max then
+
+                    local prestige_button_button = vgui.Create( "DButton", prestige_button_frame )
+                    prestige_button_button:SetPos( 0, 100 )
+                    prestige_button_button:SetSize( 150, 20 )
+                    prestige_button_button:CenterHorizontal()
+                    prestige_button_button:SetText( "Costs " .. prestige_cost .. " to " .. perk_status )
+                    prestige_button_button:SetTextColor( color_white )
+
+                    prestige_button_button.DoClick = function()
+
+                        if tonumber( LocalPlayer():GetPrestige( "points" ) ) >= 1 and prestige_current < prestige_max then
+
+                            net.Start( "handle_prestige" )
+
+                                net.WriteString( "perk" )
+                                net.WriteString( prestige_button )
+
+                            net.SendToServer()
+
+                            timer.Simple( 0.40, function()
+
+                                bwmenu_frame:Close()
+                                bwmenu( 5 )
+
+                            end )
+
+                        else
+
+                            Derma_Message( "You don't have " .. prestige_cost .. " prestige point(s)!", "Prestige Notice", "OK" )
+
+                        end
+
+                    end
+
+                    function prestige_button_button:Paint( w, h )
+
+                        local hover_color
+
+                        if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                        draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                    end
+
+                end
+
+            end
+
+            local player_prestige_points_gained
+
+            if LocalPlayer():GetLevel() < BaseWars.Config.LevelSettings.PrestigeStartingLevel then
+
+                player_prestige_points_gained = "0"
+
+            else
+
+                player_prestige_points_gained = tostring( BaseWars.Config.PrestigePointsEarned )
+
+            end
+
+            local prestige_label = vgui.Create( "DLabel", prestige_frame )
+            prestige_label:SetPos( 55, 100 )
+            prestige_label:SetFont( "Trebuchet_new" )
+            prestige_label:SetText( [[Prestiging will reset your in-game Money, XP & Levels as well as deleting all your in-game entities.
+                                         Are you sure you wish to prestige?
+
+                              You will currently gain a total of ]] .. player_prestige_points_gained .. [[ Prestige Point(s)!]] )
+            prestige_label:SizeToContents()
+
+            local prestige_confirm = vgui.Create( "DButton", prestige_frame )
+            prestige_confirm:SetPos( 275, 200 )
+            prestige_confirm:SetSize( 200, 40 )
+            prestige_confirm:SetText( "Yes, prestige!" )
+            prestige_confirm:SetTextColor( color_white )
+
+            prestige_confirm.DoClick = function()
+
+                if me:GetLevel() >= BaseWars.Config.LevelSettings.PrestigeStartingLevel then
+
+                    net.Start( "handle_prestige" )
+
+                        net.WriteString( "prestige" )
+
+                    net.SendToServer()
+
+                    timer.Simple( 0.40, function()
+
+                        bwmenu_frame:Close()
+                        bwmenu( 5 )
+
+                    end )
+
+                    Derma_Message( "You have successfully prestiged and have recieved " .. player_prestige_points_gained .. " Prestige Point!", "Prestige Notice", "OK" )
+
+                elseif me:GetLevel() < BaseWars.Config.LevelSettings.PrestigeStartingLevel then
+
+                    Derma_Message( "You're not level " .. string.format( BaseWars.LANG.CURFORMER, BaseWars.Config.LevelSettings.PrestigeStartingLevel ) .. " meaning you can't prestige!", "Prestige Notice", "OK" )
+
+                end
+
+            end
+
+            function prestige_confirm:Paint( w, h )
+
+                local hover_color
+
+                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+            end
+
+            local prestige_points = vgui.Create( "DLabel", tab_tab )
+            prestige_points:SetPos( 15.36, 30.24 )
+            prestige_points:SetFont( "Trebuchet24" )
+            prestige_points:SetText( [[  Prestige Points
+            ]] .. LocalPlayer():GetPrestige( "points" ) )
+            prestige_points:SizeToContents()
+
+            function prestige_tabs:Think()
+
+                prestige_points:SetColor( HSVToColor( CurTime() % 6 * 60, 1, 1 ) )
+
+            end
+
+            local prestige_perks_reset = vgui.Create( "DButton", tab_tab )
+            prestige_perks_reset:SetPos( w, 162 )
+            prestige_perks_reset:SetText( "Reset Prestige Perks" )
+            prestige_perks_reset:SetSize( 180, 40 )
+            prestige_perks_reset:SetTextColor( color_white )
+
+            prestige_perks_reset.DoClick = function()
+
+                local prestige_perks_reset_confirm = vgui.Create( "DFrame" )
+                prestige_perks_reset_confirm:SetSize( 400, 150 )
+                prestige_perks_reset_confirm:SetTitle( "" )
+                prestige_perks_reset_confirm:Center()
+                prestige_perks_reset_confirm:MakePopup()
+
+                function prestige_perks_reset_confirm:Paint( w, h )
+
+                    draw.RoundedBox( 0, 0, 0, w, h, Color( 45, 45, 45, 250 ) )
+
+                end
+
+                function prestige_perks_reset_confirm:Think()
+
+                    if not IsValid( bwmenu_frame ) then
+
+                        self:Close()
+
+                    end
+
+                end
+
+                local prestige_perks_reset_label = vgui.Create( "DLabel", prestige_perks_reset_confirm )
+                prestige_perks_reset_label:SetPos( 0, 50 )
+                prestige_perks_reset_label:SetText( [[Are you sure you wish to reset your prestige perks this will cost ]] .. string.format( BaseWars.LANG.CURFORMER, BaseWars.NumberFormat( BaseWars.Config.ResetPrestigePerksCost ) ) .. [[!]] )
+                prestige_perks_reset_label:SizeToContents()
+                prestige_perks_reset_label:CenterHorizontal()
+                prestige_perks_reset_label:SetTextColor( color_white )
+
+                local prestige_perks_reset_button = vgui.Create( "DButton", prestige_perks_reset_confirm )
+                prestige_perks_reset_button:SetPos( 0, 80 )
+                prestige_perks_reset_button:SetText( "Yes, reset prestige perks!" )
+                prestige_perks_reset_button:SetSize( 180, 40 )
+                prestige_perks_reset_button:CenterHorizontal()
+                prestige_perks_reset_button:SetTextColor( color_white )
+
+                prestige_perks_reset_button.DoClick = function()
+
+                    if LocalPlayer():GetMoney() < BaseWars.Config.ResetPrestigePerksCost then Derma_Message( "You don't have enough money to reset your prestige perks! ( " .. string.format( BaseWars.LANG.CURFORMER, BaseWars.NumberFormat( BaseWars.Config.ResetPrestigePerksCost ) ) .. " )", "Prestige Notice", "OK" ) prestige_perks_reset_confirm:Close() return end
+                    if LocalPlayer():GetPrestige( "prestige" ) < 1 then Derma_Message( "You haven't prestiged so you can't reset your prestige perks!", "Prestige Notice", "OK" ) prestige_perks_reset_confirm:Close() return end
+
+                    net.Start( "handle_prestige" )
+
+                        net.WriteString( "reset_prestige_perks" )
+
+                    net.SendToServer()
+
+                    timer.Simple( 0.40, function()
+
+                        bwmenu_frame:Close()
+                        bwmenu( 5 )
+
+                    end )
+
+                end
+
+                function prestige_perks_reset_button:Paint( w, h )
+
+                    local hover_color
+
+                    if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                    draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+                end
+
+            end
+
+            function prestige_perks_reset:Paint( w, h )
+
+                local hover_color
+
+                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+            end
+
+            local prestige_perks = vgui.Create( "DButton", tab_tab )
+            prestige_perks:SetPos( w, 216 )
+            prestige_perks:SetText( "Perks" )
+            prestige_perks:SetSize( 180, 40 )
+            prestige_perks:SetTextColor( color_white )
+
+            prestige_perks.DoClick = function()
+
+                change_panel( prestige_perks_frame )
+
+            end
+
+            function prestige_perks:Paint( w, h )
+
+                local hover_color
+
+                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+            end
+
+            local prestige_title = vgui.Create( "DButton", tab_tab )
+            prestige_title:SetPos( w, 270 )
+            prestige_title:SetText( "Titles" )
+            prestige_title:SetSize( 180, 40 )
+            prestige_title:SetTextColor( color_white )
+
+            prestige_title.DoClick = function()
+
+                Derma_Message( "Prestige Titles are still in-development for the Github Version.", "Prestige Notice", "OK!" )
+                -- change_panel( prestige_title_frame )
+
+            end
+
+            function prestige_title:Paint( w, h )
+
+                local hover_color
+
+                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+            end
+
+            local prestige_button2 = vgui.Create( "DButton", tab_tab )
+            prestige_button2:SetPos( w, 324 )
+            prestige_button2:SetText( "Prestige" )
+            prestige_button2:SetSize( 180, 40 )
+            prestige_button2:SetTextColor( color_white )
+
+            prestige_button2.DoClick = function()
+
+                change_panel( prestige_frame )
+
+            end
+
+            function prestige_button2:Paint( w, h )
+
+                local hover_color
+
+                if self.Hovered then hover_color = button_hover_color else hover_color = button_color end
+
+                draw.RoundedBox( 10, 0, 0, w, h, hover_color )
+
+            end
+
+        end
 
         bwmenu_tabs:AddSheet( tab_name, tab_tab, tab_icon )
 

@@ -64,7 +64,7 @@ function ENT:ThinkFunc()
 
 		return
 	end
-	
+
 	local targPos = ply:GetEyeTrace().HitPos
 	local selfPos = self.Gun:GetPos()
 	local ang = (targPos - selfPos):Angle()
@@ -87,7 +87,7 @@ function ENT:SpawnBullet( ply )
 	for i = 1, self.ShootAmt do
 		self.Gun:FireBullets( Bullet )
 	end
-	
+
     self:EmitSound(self.Sound)
 end
 
@@ -163,7 +163,7 @@ hook.Add( "Think", "ManualTurret_Check", function()
             ply:SetNW2Bool( "InTurret", false )
             ply:SetNW2Entity( "Turret", nil )
             ply:RemoveFlags( FL_ATCONTROLS )
-			
+
 			if IsValid(turret) then
 				turret.UsedBy = nil
 				ply:ChatPrint( "You are too far from the turret!" )

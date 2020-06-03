@@ -10,6 +10,7 @@ ENT.Skin = 0
 ENT.IsElectronic = true
 ENT.PowerRequired = 5
 ENT.PowerCapacity = 1000
+ENT.AppliedENTHealthPerk = false
 
 function ENT:DrainPower(val)
 
@@ -36,6 +37,22 @@ if SERVER then
 		if self:IsPowered() and self:BadlyDamaged() and math.random(0, 11) == 0 then
 
 			self:Spark()
+
+		end
+
+		if self:CPPIGetOwner():GetPrestige( "perk", "entityhealthperk" ) >= 1 and not self.AppliedENTHealthPerk then
+
+			self.AppliedENTHealthPerk = true
+
+			local ENTHealthAdditions = ( BaseWars.Config.Perks["entityhealthperk"]["Additions"] * self:CPPIGetOwner():GetPrestige( "perk", "entityhealthperk" ) )
+
+			if self:Health() + ENTHealthAdditions > self:GetMaxHealth() then
+
+				self:SetMaxHealth( self:Health() + ENTHealthAdditions )
+
+			end
+
+			self:SetHealth( self:Health() + ENTHealthAdditions )
 
 		end
 

@@ -20,6 +20,7 @@ ENT.IsValidRaidable = false
 
 ENT.MoneyPickupSound = Sound("mvm/mvm_money_pickup.wav")
 ENT.UpgradeSound = Sound("replay/rendercomplete.wav")
+ENT.AppliedCapacityPerk = false
 
 local Clamp = math.Clamp
 function ENT:GSAT(vartype, slot, name, min, max)
@@ -137,6 +138,20 @@ if SERVER then
 	function ENT:ThinkFunc()
 		if self.Disabled or self:BadlyDamaged() then return end
 		local added
+
+		if self:CPPIGetOwner():GetPrestige( "perk", "printercapacityperk" ) >= 1 then
+
+			if self.AppliedCapacityPerk == false then
+
+				self:NextThink( CurTime() + 0.2 )
+
+				self:SetCapacity( self:GetCapacity() * ( BaseWars.Config.Perks["printercapacityperk"]["Additions"] * self:CPPIGetOwner():GetPrestige( "perk", "printercapacityperk" ) ) )
+
+			end
+
+			self.AppliedCapacityPerk = true
+
+		end
 
 		local level = self:GetLevel() ^ 1.3
 

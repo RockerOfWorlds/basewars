@@ -26,7 +26,7 @@ SWEP.Category 				= "BaseWars"
 SWEP.DrawAmmo 				= false
 SWEP.Base 					= "weapon_base"
 
-SWEP.Primary.Damage     	= 30
+SWEP.Primary.Damage     	= 40
 SWEP.Primary.ClipSize 		= -1
 SWEP.Primary.Ammo 			= "none"
 SWEP.Primary.DefaultClip	= -1
@@ -51,6 +51,12 @@ end
 
 function SWEP:PrimaryAttack()
 	if not BaseWars.Raid:IsOnGoing() or (self.Owner and not self.Owner:InRaid()) then return false end
+
+	if SERVER then
+
+		self.Primary.Damage = self.Primary.Damage + ( BaseWars.Config.Perks["blowtorchpowerperk"]["Additions"] * self.Owner:GetPrestige( "perk", "blowtorchpowerperk" ) )
+
+	end
 
 	local tr = util.TraceLine({
 		start = self.Owner:GetShootPos(),

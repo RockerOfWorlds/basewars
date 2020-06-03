@@ -41,7 +41,9 @@ BaseWars.Config = {
 	-- Forums: Link to your forums, accessed with /forums
 	Forums 		= "https://forums.notfound.tech",
 	-- RulesURL: Link to your rules, accessed with /rules and the F3 Menu.
-	RulesURL		= "https://forums.notfound.tech/index.php?threads/english-basewars-rules-list.1/",
+	RulesURL	= "https://forums.notfound.tech/index.php?threads/english-basewars-rules-list.1/",
+	-- Guide: Link to your guide, accessed with /guide and the F3 Menu.
+	Guide		= "https://forums.notfound.tech/index.php?threads/english-basewars-guide.136/",
 	-- SteamGroup: Link to your steam group, accessed with /steam
 	SteamGroup 	= "http://steamcommunity.com/groups/notfoundtech",
 	-- Workshop: Link to your workshop download, accessed with /workshop
@@ -59,6 +61,12 @@ BaseWars.Config = {
 
 	-- DisableBounty: This disabled the ability to place bounties if you'd prefer to not have that.
 	DisableBounty = false,
+
+	-- PrestigePointsEarned: This is the amount of Prestige Points a player gets every prestige at Max Level.
+	PrestigePointsEarned = 1,
+
+	-- ResetPrestigePerksCost: This is the cost of Resetting Prestige Perks.
+	ResetPrestigePerksCost = 1e+13,
 
 	-- MaximumPay: Maximum amount players can give eachother, helps stop inflation
 	MaximumPay = 5 * 10^4,
@@ -135,6 +143,221 @@ BaseWars.Config = {
 		CookTime	= 60 * 2,
 	},
 
+	-- Perks: This is the config for the Prestige Perks. ( The Max Should only be 5 or 1 this issue should be solved in the next update )
+	-- DO NOT TOUCH THE ENABLED VARIABLE AS IT WILL NOT ADAPT TO THE PROPER POSITION CURRENTLY WHEN DISABLED!
+	Perks = {
+
+		-- GhostPerk: Makes you dissapear on the radar.
+		["ghostperk"] = {
+
+			["Name"] = "Ghost Perk",
+			["Description"] = "Makes you dissapear on Radars.",
+			["Additions"] = nil,
+			["Cost"] = 1,
+			["Max"] = 1,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- WalkSpeedPerk & RunSpeedPerk: Amount of walk & run speed added per prestige perk upgrade.
+		["speedperk"] = {
+
+			["Name"] = "Movement Speed",
+			["Description"] = "Increases your Walk Speed by 10 and your Run Speed by 15.",
+			["WalkAdditions"] = 10,
+			["RunAdditions"] = 15,
+			["Cost"] = 1,
+			["Max"] = 1,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- HealthPerk: Amount of health added per prestige perk upgrade.
+		["healthperk"] = {
+
+			["Name"] = "Health Perk",
+			["Description"] = "Increases your starting Health by 20.",
+			["Additions"] = 20,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- ArmorPerk: Amount of armor added per prestige perk upgrade
+		["armorperk"] = {
+
+			["Name"] = "Armor Perk",
+			["Description"] = "Increases your starting Armor by 20.",
+			["Additions"] = 20,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- EntityDamagePerk: Amount of entity damage added per prestige perk upgrade.
+		["entitydamageperk"] = {
+
+			["Name"] = "Entity Damage",
+			["Description"] = "Increases the damage you do to entities by 5.",
+			["Additions"] = 5,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- BlowtorchPowerPerk: Amount of blowtorch damage added per prestige perk upgrade.
+		["blowtorchpowerperk"] = {
+
+			["Name"] = "Blowtorch Power",
+			["Description"] = "Increases your Blowtorch Power by 0.5.",
+			["Additions"] = 0.5,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- BombClusterPerk: Amount of bomb clusters added per prestige perk upgrade.
+		["bombclusterperk"] = {
+
+			["Name"] = "Bomb Cluster",
+			["Description"] = "Inceases the amount of clusters a bomb has by 1.",
+			["Additions"] = 1,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- C4LimitPerk: Amount of C4 a person can place is upped by this amount.
+		["c4limitperk"] = {
+
+			["Name"] = "C4 Limit",
+			["Description"] = "Increases your C4 Limit to 4.",
+			["Additions"] = 4,
+			["Cost"] = 1,
+			["Max"] = 1,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- EntityHealthPerk: Amount of entity health added per prestige perk upgrade.
+		["entityhealthperk"] = {
+
+			["Name"] = "Entity Health",
+			["Description"] = "Increases your Entity Health by 200.",
+			["Additions"] = 200,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- VaultInterestPerk: Amount of interest increased per prestige perk upgrade.
+		["vaultinterestperk"] = {
+
+			["Name"] = "Vault Interest",
+			["Description"] = "Increases your Vault Interest by 0.005.",
+			["Additions"] = 0.005,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- XPGainPerk: Amount of xp gain added on top of the multiplier per prestige perk upgrade.
+		["xpgainperk"] = {
+
+			["Name"] = "XP Gain",
+			["Description"] = "Increases the XP Multiplier by 0.25.",
+			["Additions"] = 0.25,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- AdrenalinePerk: Amount of health the player goes to when reaching 0.
+		["adrenalineperk"] = {
+
+			["Name"] = "Adrenaline",
+			["Description"] = "Acts like the Shield Drug does not stack with the Shield Drug you should only have one!",
+			["Additions"] = nil,
+			["Cost"] = 1,
+			["Max"] = 1,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- PropHealthPerk: Amount of prop health added per prestige perk upgrade.
+		["prophealthperk"] = {
+
+			["Name"] = "Prop Health",
+			["Description"] = "Increases your Prop Health by 100.",
+			["Additions"] = 100,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- SoundPerk: Prevents specific entity sounds from playing.
+		["soundperk"] = {
+
+			["Name"] = "Sound Perk",
+			["Description"] = "Attempts to stop some entities from making noise.",
+			["Additions"] = nil,
+			["Cost"] = 1,
+			["Max"] = 1,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- PrinterCapacityPerk: Multiplies the printer capacity per prestige perk by the Additions amount.
+		["printercapacityperk"] = {
+
+			["Name"] = "Printer Capacity",
+			["Description"] = "Increases your Printer Capacity.",
+			["Additions"] = 2,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+		-- VaultCapacityPerk: Multiplies the vault capacity per prestige perk by the Additions amount.
+		["vaultcapacityperk"] = {
+
+			["Name"] = "Vault Capacity",
+			["Description"] = "Increases your Vault Capacity.",
+			["Additions"] = 1,
+			["Cost"] = 1,
+			["Max"] = 5,
+			["Ranks"] = false,
+			["Enabled"] = true,
+
+		},
+
+	},
+
 	Notifications = {
 		-- LinesAmount: Amount of lines on the notification HUD
 		LinesAmount = 11,
@@ -155,6 +378,8 @@ BaseWars.Config = {
 		NeededPrinters	= 1,
 		-- CertainInflictors: Only allow certain inflictors to hurt props, enable this if you liked the old style blowtorch system
 		CertainInflictors = false,
+		-- AntiRaidInterference: Prevents harming other players if that player is in a raid and the other isn't a long with disabling interaction with bombs if your not in a raid.
+		AntiRaidInterference = false,
 		-- Inflictors: If you have CertainInflictors enabled, these are the classes which can damage props
 		-- NOTE: bw_blowtorch can ALWAYS damage props, no matter the setting
 		-- NOTE: Inverted table! [class] = true
@@ -313,7 +538,9 @@ BaseWars.Config = {
 		-- BuyWeapons: Level needed to buy weapons, this is 2 to stop people wasting their starter money
 		BuyWeapons = 2,
 		-- MaxLevel: Maximum level you can be
-		MaxLevel = 9999,
+		MaxLevel = 10000,
+		-- PrestigeStartingLevel: This changes the level you can prestige at by default it's the Max Level.
+		PrestigeStartingLevel = 10000,
 	},
 
 }

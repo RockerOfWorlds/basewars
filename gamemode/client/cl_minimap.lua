@@ -83,6 +83,8 @@ function MiniMap:Draw()
 			surface.SetDrawColor(100, 255, 100, 255)
 		elseif me:InRaid() and ply:InRaid() then
 			surface.SetDrawColor(255, 100, 100, 255)
+		elseif tonumber( ply:GetPrestige( "perk", "ghostperk" ) ) >= 1 then
+			surface.SetDrawColor( 255, 255, 255, 0 )
 		else
 			surface.SetDrawColor(255, 255, 255, 255)
 		end

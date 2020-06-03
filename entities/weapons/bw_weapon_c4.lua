@@ -36,6 +36,9 @@ end
 function SWEP:PrimaryAttack()
 
 	if CLIENT then return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) >= 2 and self.Owner:GetPrestigePerks( "C4LimitPerk" ) <= 0 then self.Owner:Notify( "You cannot have more than 2 C4 placed in-game at a time!", BASEWARS_NOTIFICATION_ERROR ) return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) >= BaseWars.Config.C4LimitPerkAdditions and self.Owner:GetPrestigePerks( "C4LimitPerk" ) >= 1 then self.Owner:Notify( "You cannot have more than " .. BaseWars.Config.Perks["c4limitperk"]["Additions"] .. " C4 placed in-game at a time!", BASEWARS_NOTIFICATION_ERROR ) return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) == 0 or nil then self.Owner:SetNWInt( "InGameC4Planted", 0 ) end
 
 	local tr = util.TraceLine({
 		start = self.Owner:GetShootPos(),
@@ -46,9 +49,9 @@ function SWEP:PrimaryAttack()
 	if not tr.Hit then return end
 
 	local ent = tr.Entity
-	
+
 	if not ent:IsPlayer() and not ent:IsNPC() then
-		
+
 		local p = ent
 		local ent = ents.Create("bw_explosive_c4")
 
@@ -76,11 +79,14 @@ end
 function SWEP:SecondaryAttack()
 
 	if CLIENT then return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) >= 2 and self.Owner:GetPrestigePerks( "C4LimitPerk" ) <= 0 then self.Owner:Notify( "You cannot have more than 2 C4 placed in-game at a time!", BASEWARS_NOTIFICATION_ERROR ) return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) >= BaseWars.Config.C4LimitPerkAdditions and self.Owner:GetPrestigePerks( "C4LimitPerk" ) >= 1 then self.Owner:Notify( "You cannot have more than " .. BaseWars.Config.Perks["c4limitperk"]["Additions"] .. " C4 placed in-game at a time!", BASEWARS_NOTIFICATION_ERROR ) return end
+	if self.Owner:GetNWInt( "InGameC4Planted" ) == 0 or nil then self.Owner:SetNWInt( "InGameC4Planted", 0 ) end
 
 	local ply = self.Owner
 
 	if not ply:IsAdmin() then return end
-	
+
 	local p = ent
 	local ent = ents.Create("bw_explosive_c4")
 
@@ -89,7 +95,7 @@ function SWEP:SecondaryAttack()
 	ent:Spawn()
 	ent:Activate()
 	ent.Owner = self.Owner
-	
+
 	local po = ent:GetPhysicsObject()
 
 	if IsValid(po) then

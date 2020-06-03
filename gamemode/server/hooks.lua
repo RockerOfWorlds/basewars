@@ -5,6 +5,7 @@ hook.Add("BaseWars_PlayerBuyEntity", "XPRewards", function(ply, ent)
 	if not ent then return end
 
 	local mult = BaseWars.Config.XPMultiplier
+	mult = mult + ( BaseWars.Config.Perks["xpgainperk"]["Additions"] * ply:GetPrestige( "perk", "xpgainperk" ) )
 	local class = ent:GetClass()
 
 	if class:match("bw_printer_") or class == "bw_base_moneyprinter" then
@@ -19,6 +20,7 @@ end)
 
 hook.Add("BaseWars_PlayerEmptyPrinter", "XPRewards", function(ply, ent, money)
 	local mult = BaseWars.Config.XPMultiplier
+	mult = mult + ( BaseWars.Config.Perks["xpgainperk"]["Additions"] * ply:GetPrestige( "perk", "xpgainperk" ) )
 	ply:AddXP(math.max(0, (money / 500) * mult))
 end)
 

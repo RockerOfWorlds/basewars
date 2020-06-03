@@ -11,14 +11,96 @@ ENT.Sound           = Sound("HL1/fvox/blip.wav")
 
 ENT.Radius          = 600
 ENT.PowerRequired   = 15
+ENT.IsPrinter		= true
+ENT.IsVault			= true
 
 ENT.PowerCapacity   = 25000
 ENT.PresetMaxHealth = 1000
 
 ENT.CollectInterval = 10 -- also interest interval for sake of simplicity
 ENT.InterestRate    = 0.001
+ENT.StartingMoney	= 20000000000
+
+ENT.MaxLevel		= 50
+ENT.IsValidRaidable	= true
 
 ENT.CollectSound    = Sound("mvm/mvm_money_pickup.wav")
+ENT.AppliedInterestRatePerk = false
+ENT.AppliedCapacityPerk = false
+
+function ENT:getUpgradeCost( lvl )
+
+	return self.StartingMoney / 4 * lvl
+
+end
+
+function ENT:StableNetwork()
+
+	self:NetworkVar( "Int", 4, "Level" )
+	self:NetworkVar( "String", 2, "UpgradeCost" )
+
+	self._SetUpgradeCost = self._SetUpgradeCost or self.SetUpgradeCost
+
+	function self:SetUpgradeCost( val )
+
+		self:_SetUpgradeCost( tostring( val ) )
+
+	end
+
+end
+
+function ENT:Upgrade( ply, supress )
+
+	local Owner = BaseWars.Ents:ValidOwner( self )
+	if not BaseWars.Ents:Valid( self ) then return end
+	if not BaseWars.Ents:ValidPlayer( Owner ) or not BaseWars.Ents:ValidPlayer( ply ) then return end
+	if Owner ~= ply then return end
+	local lvl = self:GetLevel()
+	local calcM = self:getUpgradeCost( lvl )
+
+	if ply then
+
+		local plyM = ply:GetMoney()
+
+		if plyM < calcM then
+
+			if not supress then ply:Notify( BaseWars.LANG.UpgradeNoMoney, BASEWARS_NOTIFICATION_ERROR ) end
+
+			return false
+
+		end
+
+		if lvl >= self.MaxLevel then
+
+			if not supress then ply:Notify( BaseWars.LANG.UpgradeMaxLevel, BASEWARS_NOTIFICATION_ERROR ) end
+
+			return false
+
+		end
+
+		ply:TakeMoney( calcM )
+		self.CurrentValue = self.CurrentValue + calcM
+
+	end
+
+	if self:GetLevel() >= 1 then
+
+		current_money = self.StartingMoney / 2 * lvl
+
+	end
+
+	self:SetLevel( lvl + 1 )
+	self:EmitSound( self.UpgradeSound )
+
+	return true
+
+end
+
+function ENT:Init()
+
+	self:SetLevel( 1 )
+
+end
 
 function ENT:TakeMoneyFrom(printer)
 	local money = printer:GetMoney()
@@ -30,6 +112,24 @@ end
 function ENT:ThinkFunc()
 	if self.nextCollect and self.nextCollect > CurTime() then return end
 	self.nextCollect = CurTime() + self.CollectInterval
+
+	if self:CPPIGetOwner():GetPrestige( "perk", "vaultinterestperk" ) >= 1 and not self.AppliedInterestRatePerk then
+
+		self.AppliedInterestRatePerk = true
+
+		self.InterestRate = self.InterestRate + ( BaseWars.Config.Perks["vaultinterestperk"]["Additions"] * self:CPPIGetOwner():GetPrestige( "perk", "vaultinterestperk" ) )
+
+	end
+
+	if self:CPPIGetOwner():GetPrestige( "perk", "vaultcapacityperk" ) >= 1 and not self.AppliedCapacityPerk then
+
+		self.AppliedCapacityPerk = true
+
+		self.MaxLevel = self.MaxLevel + ( self.MaxLevel * self:CPPIGetOwner():GetPrestige( "perk", "vaultcapacityperk" ) )
+
+		self:SetLevel( self.MaxLevel / 4 )
+
+	end
 
 	self.money = self.money and math.floor(self.money * (1 + self.InterestRate)) or 0
 
@@ -45,7 +145,7 @@ function ENT:ThinkFunc()
 		if v:IsPlayer() then continue end
 		if not v.TakeMoney then continue end
 		if v:CPPIGetOwner() ~= owner then continue end
-		
+
 		self:TakeMoneyFrom(v)
 	end
 
@@ -118,14 +218,35 @@ ENT.FontColor = Color(255, 255, 255)
 ENT.FontColor2 = Color(200, 255, 200)
 
 function ENT:DrawDisplay(pos, ang, scale)
+
 	local w, h = 216 * 2, 136 * 2
 
+	current_money = string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat(self.StartingMoney  * 2 * self:GetLevel()))
+
 	local money = self:GetMoney()
-	local text = string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat(money))
+	local text = string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat(money) .. " / " .. current_money)
 	draw.DrawText(text, "vault_font", w / 2, h / 2, self.FontColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-	local interest = string.format("Interest: %s%% | Next Gain: %s", self.InterestRate * 100, string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat(math.floor(money * self.InterestRate))))
-	draw.DrawText(interest, "vault_font2", w / 2, h / 2 + 120, self.FontColor2, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	local current_money2
+
+	if self:GetLevel() >= MaxLevel then
+
+		current_money2 = BaseWars.LANG.MaxLevel
+
+	else
+
+		current_money2 = string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat( self:getUpgradeCost( self:GetLevel() ) ) )
+
+	end
+
+	local interest = string.format("Interest - %s%% | Next Gain - %s", self.InterestRate * 100, string.format(BaseWars.LANG.CURFORMER, BaseWars.NumberFormat(math.floor(money * Interest))))
+	draw.DrawText(interest, "vault_font2", w / 2, h / 2 + 100, self.FontColor2, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
+    local capacity = string.format("Next Upgrade Cost - %s", current_money2)
+	draw.DrawText(capacity, "vault_font2", w / 2, h / 2 + 140, self.FontColor2, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
+	draw.DrawText("Current Level - " .. self:GetLevel() .. " / " .. MaxLevel, "vault_font2", w / 2, h / 2 + 180, self.FontColor2, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
 end
 
 function ENT:Calc3D2DParams()
