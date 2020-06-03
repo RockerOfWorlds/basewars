@@ -351,6 +351,7 @@ BaseWars.Commands.AddCommand({"dropmoney"}, function(ply)
 end, false)
 
 BaseWars.Commands.AddCommand({"bounty", "place", "placebounty"}, function(ply, line, who, amount)
+	if BaseWars.Config.DisableBounty then return false, "The ability to place bounties was disabled on this server." end
 	if not easylua then return false, "easylua is required for this command, tell your dev to change how it works or install easylua" end
 	if not who then return false, BaseWars.LANG.InvalidPlayer end
 	if not amount then return false, BaseWars.LANG.InvalidAmount end

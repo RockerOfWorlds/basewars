@@ -40,7 +40,7 @@ BaseWars.Config = {
 
 	-- Forums: Link to your forums, accessed with /forums
 	Forums 		= "https://forums.notfound.tech",
-	-- Rules: Link to your rules, accessed with /rules and the F3 Menu.
+	-- RulesURL: Link to your rules, accessed with /rules and the F3 Menu.
 	RulesURL		= "https://forums.notfound.tech/index.php?threads/english-basewars-rules-list.1/",
 	-- SteamGroup: Link to your steam group, accessed with /steam
 	SteamGroup 	= "http://steamcommunity.com/groups/notfoundtech",
@@ -56,6 +56,9 @@ BaseWars.Config = {
 
 	-- DisableGiveMoney: This disables the ability to give money if you'd prefer not to have that.
 	DisableGiveMoney = false,
+
+	-- DisableBounty: This disabled the ability to place bounties if you'd prefer to not have that.
+	DisableBounty = false,
 
 	-- MaximumPay: Maximum amount players can give eachother, helps stop inflation
 	MaximumPay = 5 * 10^4,

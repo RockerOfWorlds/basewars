@@ -29,7 +29,7 @@ The gamemode's default config uses Customizable Weaponry 2.0, you can install th
 Or, if you want, just edit the config to use other weapons!
 
 ### Prerequisites
-* A CPPI compliant prop-protection addon.
+* A CPPI compliant prop-protection addon. [recommended](https://github.com/FPtje/Falcos-Prop-protection)
 * A fading door addon.
 * Easylua, which can be downloaded [here](https://github.com/Noiwex/luadev/blob/master/lua/autorun/easylua.lua)!
 
@@ -39,6 +39,8 @@ Or, if you want, just edit the config to use other weapons!
 * Edit ```garrysmod/gamemodes/basewars/gamemode/config.lua``` to your own liking.
 
 ## Screenshots
+
+These Screenshots have not been updated.
 
 ### Help Menu
 ![ScreenShot](http://puu.sh/mALs7/ad13259bff.jpg)
@@ -62,11 +64,11 @@ Or, if you want, just edit the config to use other weapons!
   **Developer:** [Stepan Fedotov](mailto:admin@futuretechs.eu)
 
   **Developer:** [Ling](mailto:ling@hexahedron.pw)
-  
+
 ### Others
 
   Credited in the author field of the gamemode.
-  
+
 # Git stuff
 
 ## Contributing
@@ -131,7 +133,7 @@ See [CONTRIBUTING](CONTRIBUTING.md).
 
 -- Same as above, false to make them unraidable, followed by a reason why.
 	hook.Add("PlayerIsRaidable", "name", function(ply) end)
-	
+
 -- Called when certain drug events happen to a player
 	hook.Add("PlayerRemoveDrug", "name", function(ply, effect) end)
 	hook.Add("PlayerApplyDrug", "name", function(ply, effect) end)
