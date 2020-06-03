@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS `basewars` (
   `time` bigint(20) unsigned NOT NULL DEFAULT '0',
   `xp` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
-  `prestige` int(11) NOT NULL DEFAULT '0',
+  `prestige` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0',
   PRIMARY KEY (`sid64`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

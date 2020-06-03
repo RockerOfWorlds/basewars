@@ -254,6 +254,7 @@ if SERVER then
 
 	function ENT:Use(activator, caller, ut, value)
 		if self.NextUse and self.NextUse > CurTime() then return end
+		if BaseWars.Config.AntiRaidInterference and not activator:InRaid() then return end
 
 		if not self:GetNW2Bool("IsArmed") then
 			if self.UsePlant then
