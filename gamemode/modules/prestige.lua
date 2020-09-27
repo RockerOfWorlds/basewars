@@ -187,24 +187,21 @@ if SERVER then
 
     function MODULE:ResetPrestigePerks( ply )
 
-        local prestige_perks = { "ghostperk", "speedperk", "healthperk", "armorperk", "entitydamageperk", "blowtorchpowerperk", "bombclusterperk", "c4limitperk", "entityhealthperk", "vaultinterestperk", "xpgainperk", "adrenalineperk", "prophealthperk", "soundperk", "printercapacityperk", "vaultcapacityperk" }
-        local prestige_give = { ["Prestige"] = 0 }
+        local prestige_give = 0
 
-        self:SetPrestige( ply, "points", 0 )
+        for k, v in pairs( BaseWars.Config.Perks ) do
 
-        for i = 1, #prestige_perks do
+            if self:GetPrestige( ply, "perk", k ) >= 1 then
 
-            if self:GetPrestige( ply, "perk", prestige_perks[i] ) >= 1 then
+                prestige_give = prestige_give + ( BaseWars.Config.Perks[k]["Cost"] * self:GetPrestige( ply, "perk", k ) )
 
-                prestige_give["Prestige"] = ( prestige_give["Prestige"] + 1 ) * self:GetPrestige( ply, "perk", prestige_perks[i] )
-
-                self:SetPrestige( ply, "perk", 0, prestige_perks[i] )
+                self:SetPrestige( ply, "perk", 0, k )
 
             end
 
         end
 
-        self:SetPrestige( ply, "points", prestige_give["Prestige"] )
+        self:GivePrestige( ply, "points", prestige_give )
 
     end
     PLAYER.ResetPrestigePerks = Curry( MODULE.ResetPrestigePerks )
@@ -227,6 +224,7 @@ if SERVER then
 
             if pl:GetMoney() < BaseWars.Config.ResetPrestigePerksCost then return end
 
+            pl:TakeMoney( BaseWars.Config.ResetPrestigePerksCost )
             pl:ResetPrestigePerks()
 
         end

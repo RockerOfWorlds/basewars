@@ -1,10 +1,10 @@
-# Update v1.1.2 Changelog
+# Update v1.1.3 Changelog
 ## Release Date: 9/27/2020
 
 ### This updated includes:
 
-* Fixing Prestige Perks not properly being set.
-* Fixing using the wrong argument in handle_prestige. ( ply instead of pl )
+* Fixing Reset Prestige Perks not giving the proper amount and setting your points to 0.
+* Fixing Reset Prestige Perks not taking the money from the player.
 
 ### Previous Update v1.1.1 Changelog
 
