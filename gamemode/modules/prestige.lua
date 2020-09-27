@@ -26,13 +26,17 @@ function MODULE:GetPrestige( ply, type, perk )
 
     elseif type == "perk" then
 
-        for i = 1, table.Count( BaseWars.Config.Perks ) do
+        local i
 
-            if BaseWars.Config.Perks[string.lower(perk)] ~= nil then
+        for k, v in pairs( BaseWars.Config.Perks ) do
+
+            if k == string.lower(perk) then
 
                 return tonumber( current_prestige[i + 2] ) or 0
 
             end
+
+            i = i + 1
 
         end
 
@@ -95,13 +99,17 @@ if SERVER then
 
         elseif type == "perk" then
 
-            for i = 1, table.Count( BaseWars.Config.Perks ) do
+            local i
 
-                if BaseWars.Config.Perks[string.lower(perk)] ~= nil then
+            for k, v in pairs( BaseWars.Config.Perks ) do
+
+                if k == string.lower(perk) then
 
                     current_prestige[i + 2] = tostring( amount )
 
                 end
+
+                i = i + 1
 
             end
 
@@ -207,19 +215,19 @@ if SERVER then
 
         if type == "prestige" then
 
-            ply:Prestige()
+            pl:Prestige()
 
         elseif type == "perk" then
 
             local perk = net.ReadString()
 
-            ply:UpgradePerk( perk )
+            pl:UpgradePerk( perk )
 
         elseif type == "reset_prestige_perks" then
 
-            if ply:GetMoney() < BaseWars.Config.ResetPrestigePerksCost then return end
+            if pl:GetMoney() < BaseWars.Config.ResetPrestigePerksCost then return end
 
-            ply:ResetPrestigePerks()
+            pl:ResetPrestigePerks()
 
         end
 
