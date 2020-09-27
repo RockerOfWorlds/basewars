@@ -8,10 +8,11 @@ DEFINE_BASECLASS(ENT.Base)
 ENT.PrintName    = "Freezing Tower"
 ENT.Model        = "models/props_c17/utilityconnecter006c.mdl"
 ENT.Material     = "models/player/shared/ice_player"
+ENT.Spawnable = true
 
 ENT.Range        = 300
 
-ENT.FireDelay    = 2
+ENT.FireDelay    = 4
 ENT.ScanDelay    = 1
 
 ENT.FreezeTime   = 5
@@ -30,17 +31,8 @@ function ENT:hitTarget(target)
 	target:RemoveDrug("steroid")
 	target:ApplyDrug("Stun", 25)
 
-	if target:GetPrestige( "perk", "speedperk" ) >= 2 then
-
-		target:SetWalkSpeed( BaseWars.Config.DefaultWalk + BaseWars.Config.Perks["speedperk"]["WalkAdditions"] * target:GetPrestige( "perk", "speedperk" ) / ( self:GetLevel() * 2 ) )
-		target:SetRunSpeed( BaseWars.Config.DefaultWalk + BaseWars.Config.Perks["speedperk"]["WalkAdditions"] * target:GetPrestige( "perk", "speedperk" ) / ( self:GetLevel() * 2 ) )
-
-	else
-
-		target:SetWalkSpeed(BaseWars.Config.DefaultWalk * 2.5 / ( self:GetLevel() * 2 ) )
-		target:SetRunSpeed(BaseWars.Config.DefaultWalk * 2.5 / ( self:GetLevel() * 2 ) )
-
-	end
+	target:SetWalkSpeed(BaseWars.Config.DefaultWalk - 80 - ( self:GetLevel() * 10 ) )
+	target:SetRunSpeed(BaseWars.Config.DefaultWalk - 80 - ( self:GetLevel() * 10 ) )
 
 	timer.Create("tower_freeze_" .. tostring(target), self.FreezeTime, 1, function()
 		if not IsValid(target) then return end
@@ -49,8 +41,8 @@ function ENT:hitTarget(target)
 
 		if target:GetPrestige( "perk", "speedperk" ) >= 1 then
 
-			target:SetWalkSpeed( BaseWars.Config.DefaultWalk + BaseWars.Config.Perks["speedperk"]["WalkAdditions"] * target:GetPrestige( "perk", "speedperk" ) )
-			target:SetRunSpeed( BaseWars.Config.DefaultRun + BaseWars.Config.Perks["speedperk"]["RunAdditions"] * target:GetPrestige( "perk", "speedperk" ) )
+			target:SetWalkSpeed( BaseWars.Config.DefaultWalk + BaseWars.Config.Perks["speedperk"].WalkAdditions * target:GetPrestige( "perk", "speedperk" ) )
+			target:SetRunSpeed( BaseWars.Config.DefaultRun + BaseWars.Config.Perks["speedperk"].RunAdditions * target:GetPrestige( "perk", "speedperk" ) )
 
 		else
 

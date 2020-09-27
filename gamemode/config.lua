@@ -62,6 +62,9 @@ BaseWars.Config = {
 	-- DisableBounty: This disabled the ability to place bounties if you'd prefer to not have that.
 	DisableBounty = false,
 
+	-- DisableC4Throwing: This disables the ability to throw C4 if you'd prefer to not have that.
+	DisableC4Throwing = true,
+
 	-- PrestigePointsEarned: This is the amount of Prestige Points a player gets every prestige at Max Level.
 	PrestigePointsEarned = 1,
 
